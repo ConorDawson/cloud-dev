@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Current Graphs</title>
+  <link rel="stylesheet" href="/current.css">
+  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script> <!-- Axios -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script> <!-- Chart.js -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.16.9/xlsx.full.min.js"></script> <!-- XLSX -->
+  <script src="/current_graph.js" defer></script> 
+</head>
+<body class="container">
+
+  <div class="navbar">
+    <form action="/logout" method="POST">
+      <button type="submit" class="button">Logout</button>
+    </form>
+    
+    <form action="/current" method="POST">
+      <button type="submit" class="button">Current Reports</button>
+    </form>
+
+    <form action="/home" method="POST">
+      <button type="submit" class="button">My Timesheet</button>
+    </form>
+    <form action="/logout" method="POST">
+      <button type="submit" class="button">My Work Breakdown</button>
+    </form>
+    <form action="/logout" method="POST">
+      <button type="submit" class="button">Predictive Reports</button>
+    </form>
+    <form action="/logout" method="POST">
+      <button type="submit" class="button">Employee Reports</button>
+    </form>
+  </div>
+
+  <div class="reports_card">
+  <h1 id="reportHeading">CURRENT GRAPHS</h1>
+
+    <!-- Dropdown for selecting client and year -->
+    <div class="filter-container">
+      <label for="client">Select Client:</label>
+      <select id="client">
+        
+      </select>
+      
+      <label for="year">Select Year:</label>
+      <select id="year">
+    
+      </select>
+      
+      <button class ="gen-button" id="generateReport">Generate Report</button>
+    </div>
+
+  <!-- Canvas for the chart -->
+  <canvas id="clientHoursChart"></canvas>
+
+  <!-- Table for monthly hours -->
+  <table id="reportTable">
+      <thead>
+          <tr>
+              <th>Month</th>
+              <th>Total Hours Worked</th>
+          </tr>
+      </thead>
+      <tbody id="reportTableBody">
+          <!-- Table rows will be dynamically added here -->
+      </tbody>
+  </table>
+
+  <button class="gen-button" id="downloadReport">Download Report</button>
+</div>
+</body>
+</html>

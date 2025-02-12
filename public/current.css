@@ -1,0 +1,445 @@
+body {
+  background-color: #F5E7DE;
+}
+  /* Card style wrapper for the table */
+  .card {
+    width: 90%;
+    max-width: 1200px;
+    height: auto;
+    background: #07182E;  /* Dark background for the card */
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    place-content: center;
+    place-items: center;
+    overflow: hidden;
+    border-radius: 20px;
+    margin: 20px auto;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); /* Soft shadow for depth */
+    padding-top: 20px; /* Padding to create space below navbar */
+    margin-top: 80px; /* Ensure card starts below the navbar */
+  }
+  
+  /* Card title styling */
+  .card h2 {
+    z-index: 1;
+    color: white;
+    font-size: 2em;
+    text-align: center;
+    padding: 15px;
+    margin: 0;
+  }
+  
+  /* Card background animation */
+  .card::before {
+    content: '';
+    position: absolute;
+    width: 100%;
+    background-image: linear-gradient(180deg, rgb(0, 183, 255), rgb(255, 48, 255));
+    height: 130%;
+    animation: rotBGimg 3s linear infinite;
+    transition: all 0.2s linear;
+  }
+  
+  @keyframes rotBGimg {
+    from {
+      transform: rotate(0deg);
+    }
+    to {
+      transform: rotate(360deg);
+    }
+  }
+  
+  .card::after {
+    content: '';
+    position: absolute;
+    background: #07182E;
+    inset: 5px;
+    border-radius: 15px;
+  }
+  
+  /* Timesheet container and table styling */
+  .timesheet-container {
+    display: flex;
+    flex-direction: column; /* Stack the table and the button */
+    justify-content: flex-start;
+    align-items: center;
+    margin: 20px;
+    z-index: 2;
+    position: relative; /* Allow button to be positioned below */
+    padding-top: 20px; /* Ensures content starts after navbar */
+  }
+  
+  .timesheet-table {
+    border-collapse: collapse;
+    width: 100%;
+    max-width: 100%;
+    background-color: #2e2e2e; /* Darker background for elegance */
+    color: #e0e0e0; /* Light text for readability */
+    border: 1.5px solid #149CEA; /* Dark teal border for consistency */
+  }
+  
+  .timesheet-table th,
+  .timesheet-table td {
+    border: 1.5px solid #149CEA; /* Matching border color */
+    padding: 12px;
+    text-align: center;
+    font-size: 1em;
+  }
+  
+  .timesheet-table th {
+    background-color: #149CEA; /* Dark teal header */
+    color: #e0e0e0; /* Light text for the header */
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+  
+  .timesheet-table td {
+    background-color: #333333; /* Dark background for cells */
+  }
+  
+  .timesheet-table td:hover {
+    background-color: #444444; /* Slight hover effect for cells */
+  }
+  
+  /* Input fields for the table cells */
+  .day-input {
+    width: 100%;
+    padding: 8px;
+    background: #333333; /* Dark input field background */
+    border: 1.5px solid #149CEA; /* Matching border color */
+    color: #e0e0e0; /* Light text inside the input */
+    border-radius: 5px;
+    text-align: center;
+    outline: none;
+    font-size: 1em;
+  }
+  
+  .day-input:focus {
+    border-color: #149CEA; /* Lighter teal for focus effect */
+    background-color: #444444; /* Darker background on focus */
+  }
+  
+  .day-input::placeholder {
+    color: #149CEA; /* Placeholder color to match the professional theme */
+  }
+  
+  
+  .button-container {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    margin-top: 20px; /* Adds space between the table and the submit button */
+  }
+  /* Submit button positioned below the table */
+  /* Apply the animation to buttons with the 'submit' class */
+  .submit {
+    width: 10em;
+    position: relative;
+    height: 3.5em;
+    border: 3px ridge #149CEA;
+    outline: none;
+    background-color: transparent;
+    color: white;
+    transition: 1s;
+    border-radius: 0.3em;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+  }
+  
+  .submit::after {
+    content: "";
+    position: absolute;
+    top: -10px;
+    left: 3%;
+    width: 95%;
+    height: 40%;
+    background-color: #07182E;
+    transition: 0.5s;
+    transform-origin: center;
+  }
+  
+  .submit::before {
+    content: "";
+    transform-origin: center;
+    position: absolute;
+    top: 80%;
+    left: 3%;
+    width: 95%;
+    height: 40%;
+    background-color: #07182E;
+    transition: 0.5s;
+  }
+  
+  .submit:hover::before,
+  .submit:hover::after {
+    transform: scale(0);
+  }
+  
+  .submit:hover {
+    box-shadow: inset 0px 0px 25px #1479EA;
+  }
+  
+  
+  /* Navbar styling */
+  .navbar {
+    width: 100%;
+    background-color: #07182E;
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 1000;
+    display: flex;
+    justify-content: center; /* Center the navbar items */
+    align-items: center;
+    padding: 10px 20px;
+  }
+  
+  /* Navbar link styling */
+  .navbar .navbar-links {
+    display: flex;
+    gap: 15px;
+  }
+  
+  .navbar .navbar-links a {
+    color: white;
+    text-decoration: none;
+    font-size: 18px;
+    font-weight: bold;
+    padding: 10px 15px;
+    transition: background-color 0.3s ease;
+  }
+  
+  .navbar .navbar-links a:hover {
+    background-color: #ff4d4d;
+    border-radius: 5px;
+  }
+  
+  .button {
+    position: relative;
+    width: 120px;
+    height: 40px;
+    background-color: #000;
+    display: flex;
+    align-items: center;
+    color: white;
+    flex-direction: column;
+    justify-content: center;
+    border: none;
+    padding: 12px;
+    gap: 12px;
+    border-radius: 8px;
+    cursor: pointer;
+  }
+  
+  .button::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    left: -4px;
+    top: -1px;
+    margin: auto;
+    width: 128px;
+    height: 48px;
+    border-radius: 10px;
+    background: linear-gradient(-45deg, #e81cff 0%, #40c9ff 100% );
+    z-index: -10;
+    pointer-events: none;
+    transition: all 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  }
+  
+  .button::after {
+    content: "";
+    z-index: -1;
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(-45deg, #fc00ff 0%, #00dbde 100% );
+    transform: translate3d(0, 0, 0) scale(0.95);
+    filter: blur(20px);
+  }
+  
+  .button:hover::after {
+    filter: blur(30px);
+  }
+  
+  .button:hover::before {
+    transform: rotate(-180deg);
+  }
+  
+  .button:active::before {
+    scale: 0.7;
+  }
+  
+  .navbar form {
+    margin-right: 15px; /* Adds space between each form */
+  }
+  
+  .navbar form:last-child {
+    margin-right: 0; /* Removes margin for the last form to prevent extra space */
+  }
+  
+  .navbar .button {
+    padding: 10px 20px; /* Adjust button padding if necessary */
+    font-size: 16px;
+  }
+  
+  .navbar .button {
+    margin-right: 15px; /* Adds space between buttons */
+  }
+  
+  .navbar .button:last-child {
+    margin-right: 0; /* Removes margin for the last button */
+  }
+  
+
+
+
+  /* From Uiverse.io by cssbuttons-io */ 
+  .gen-button {
+  --color: #FF6B01;
+  font-family: inherit;
+  display: inline-block;
+  width: 8em;
+  height: 2.6em;
+  line-height: 2.5em;
+  margin: 20px;
+  position: relative;
+  cursor: pointer;
+  overflow: hidden;
+  border: 2px solid var(--color);
+  transition: color 0.5s;
+  z-index: 1;
+  font-size: 17px;
+  border-radius: 6px;
+  font-weight: 500;
+  color: var(--color);
+}
+
+.gen-button:before {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  background: var(--color);
+  height: 150px;
+  width: 200px;
+  border-radius: 50%;
+}
+
+.gen-button:hover {
+  color: #fff;
+}
+
+.gen-button:before {
+  top: 100%;
+  left: 100%;
+  transition: all 0.7s;
+}
+
+.gen-button:hover:before {
+  top: -30px;
+  left: -30px;
+}
+
+.gen-button:active:before {
+  background: #FF6B01;
+  transition: background 0s;
+}
+
+
+
+/* From Uiverse.io by Yaseen549 */ 
+.reports_card {
+  margin-top: 100px;
+  margin-left: 10%;
+  padding: 20px;
+  width: 80%;
+  border-radius: 30px;
+  background: #212121;
+  box-shadow: 15px 15px 30px rgb(25, 25, 25),
+              -15px -15px 30px rgb(60, 60, 60);
+ }
+ 
+
+ #clientHoursChart {
+  margin-top: 20px;
+}
+
+table {
+  width: 100%;
+  margin-top: 20px;
+  border-collapse: collapse;
+}
+
+table th, table td {
+  border: 1px solid #555555; /* Medium gray border */
+  padding: 10px;
+  text-align: center;
+}
+
+table th {
+  background-color: #F2BFA4; 
+}
+
+table td {
+  background-color: #ffffff; /* Very dark gray background for table cells */
+}
+
+#reportHeading {
+  color: #ffffff; /* White text color */
+  font-size: 1.5em;
+  text-align: center;
+  margin-top: 20px;
+}
+ 
+
+#client, #year {
+  width: 100%;
+  padding: 10px;
+  margin: 10px 0;
+  border: 1px solid #555555; /* Medium gray border */
+  border-radius: 5px;
+  box-sizing: border-box;
+}
+
+
+/* Popup Modal */
+.popup-modal {
+  display: none;
+  position: fixed;
+  z-index: 2000;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  justify-content: center;
+  align-items: center;
+}
+
+.popup-content {
+  background: white;
+  padding: 20px;
+  border-radius: 8px;
+  width: 400px;
+  box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+  text-align: center;
+}
+
+.popup-content h2 {
+  margin-bottom: 10px;
+}
+
+.popup-close {
+  background: #ff4d4d;
+  color: white;
+  border: none;
+  padding: 10px;
+  border-radius: 5px;
+  cursor: pointer;
+  margin-top: 10px;
+}
+
+.popup-close:hover {
+  background: #cc0000;
+}

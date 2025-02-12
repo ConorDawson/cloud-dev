@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Timesheet</title>
+  <link rel="stylesheet" href="/home.css">
+  <script src="/home.js" defer></script>
+</head>
+<body class="container">
+  
+  <!-- Navbar -->
+  <div class="navbar">
+    <form action="/logout" method="POST">
+      <button type="submit" class="button">
+        Logout
+      </button>
+    </form>
+    
+    <form action="/current" method="POST">
+      <button type="submit" class="button">
+        Current Reports
+      </button>
+    </form>
+  
+    <form action="/home" method="GET">
+      <button type="submit" class="button">
+        My Timesheet
+      </button>
+    </form>
+  
+    <form action="/logout" method="POST">
+      <button type="submit" class="button">
+        My Work Breakdown
+      </button>
+    </form>
+  
+    <form action="/logout" method="POST">
+      <button type="submit" class="button">
+        Predictive Reports
+      </button>
+    </form>
+  
+    <form action="/logout" method="POST">
+      <button type="submit" class="button">
+        Employee Reports
+      </button>
+    </form>
+  </div>
+  
+
+  <div class="card">
+    <h2 id="employee-name">Timesheet</h2>
+
+    <p id="user-info"></p>
+
+   
+    
+    <div class="timesheet-container">
+      <table class="timesheet-table">
+        <thead>
+          <tr>
+            <th>Client Name</th>
+          </tr>
+        </thead>
+        <tbody id="client-rows">
+        </tbody>
+      </table>
+
+      <!-- Wrap buttons inside the button container -->
+      <div class="button-container">
+        <button id="previous-week-button" class="submit" onclick="goToPreviousWeek()">Previous Week</button>
+        <button id="next-week-button" class="submit" onclick="goToNextWeek()">Next Week</button>
+        <button id="submit-button" class="submit">Submit</button>
+      </div>
+    </div>
+  </div>
+
+</body>
+</html>
