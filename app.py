@@ -1,7 +1,7 @@
 import psycopg2
 from flask import Flask, jsonify, request
-
-# Database connection information
+from python.current_reports.current_reports import fetch_client_data, process_client_data, calculate_profit_loss, prepare_final_data
+from python.current_reports.monthly_details import fetch_monthly_report
 DB_CONFIG = {
     "user": "postgres",
     "password": "postgres",
@@ -25,67 +25,61 @@ def get_db_connection():
     )
     return conn
 
+
 @app.route('/api/client_hours', methods=['GET'])
 def get_client_hours():
     """
-    Fetches total hours worked for each client and returns them as a JSON response.
+    Fetches all necessary data from the database for each client based on the selected date range,
+    and calculates total hours worked, cost, and profit/loss %.
     """
-    query = """
-    SELECT company_name, SUM(hours) AS total_hours
-    FROM timesheet_hours2
-    GROUP BY company_name
-    ORDER BY company_name;
-    """
-    data = {}
+    start_date = request.args.get('start_date')
+    end_date = request.args.get('end_date')
 
     try:
-        with psycopg2.connect(**DB_CONFIG) as conn:
-            with conn.cursor() as cursor:
-                cursor.execute(query)
-                rows = cursor.fetchall()
-                for company, hours in rows:
-                    data[company] = float(hours)
-    except Exception as e:
-        print(f"Error fetching data: {e}")
+        # Step 1: Fetch all necessary data from the database
+        rows = fetch_client_data(start_date, end_date)
+        # Step 2: Process the data and calculate totals
+        client_data = process_client_data(rows)
+        # Step 3: Calculate profit/loss for each client
+        client_data = calculate_profit_loss(client_data, start_date, end_date)
+        # Step 4: Prepare final data for the response
+        response_data = prepare_final_data(client_data)
 
-    return jsonify(data)
+        return jsonify(response_data)
+
+    except Exception as e:
+        print(f"Error fetching or processing data: {e}")
+        return jsonify({'error': 'Error fetching data'}), 500
+    
 
 
 @app.route('/api/monthly_report', methods=['GET'])
 def get_monthly_report():
     """
-    Fetches the monthly breakdown of hours worked for a specific client and year.
+    Fetches the monthly breakdown of hours worked, cost, client payment, and profit/loss for a specific client and year.
     The client and year are provided as query parameters.
     """
     client = request.args.get('client')
-    year = request.args.get('year')
+    start_date = request.args.get('start_date')
+    end_date = request.args.get('end_date')
 
-    if not client or not year:
+    if not client or not start_date:
         return jsonify({"error": "Client and Year parameters are required"}), 400
 
-    query = """
-    SELECT EXTRACT(MONTH FROM work_date) AS month, SUM(hours) AS total_hours
-    FROM timesheet_hours2
-    WHERE company_name = %s AND EXTRACT(YEAR FROM work_date) = %s
-    GROUP BY month
-    ORDER BY month;
-    """
-    
-    data = {}
-
     try:
-        with psycopg2.connect(**DB_CONFIG) as conn:
-            with conn.cursor() as cursor:
-                cursor.execute(query, (client, year))
-                rows = cursor.fetchall()
-                for month, hours in rows:
-                    data[int(month)] = float(hours)
-                
-        
-    except Exception as e:
-        print(f"Error fetching data: {e}")
+        # Step 1: Fetch the monthly report data from the database
+        rows = fetch_monthly_report(client, start_date, end_date)
 
-    return jsonify(data)
+        return jsonify(response_data)
+
+    except Exception as e:
+        print(f"Error fetching or processing data: {e}")
+        return jsonify({'error': 'Error fetching data'}), 500   
+    
+
+
+
+
 
 if __name__ == '__main__':
     app.run(port=5001)

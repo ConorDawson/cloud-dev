@@ -38,36 +38,38 @@
   <div class="reports_card">
   <h1 id="reportHeading">CURRENT GRAPHS</h1>
 
-    <!-- Dropdown for selecting client and year -->
-    <div class="filter-container">
-      <label for="client">Select Client:</label>
-      <select id="client">
-        
-      </select>
-      
-      <label for="year">Select Year:</label>
-      <select id="year">
-    
-      </select>
-      
-      <button class ="gen-button" id="generateReport">Generate Report</button>
-    </div>
+   <input type="date" id="startDate" class="date">
+   <input type="date" id="endDate" class="date">
+    <button class="gen-button" id="generateReport">Generate Report</button>
 
   <!-- Canvas for the chart -->
-  <canvas id="clientHoursChart"></canvas>
+  <canvas id="clientHoursChart">
+    <div id="t" class="toast">
+      <div class="toast-content">
+          <h2 id="modalTitle"></h2>
+          <div id="modalBody"></div>
+      </div>
+  </div>
+  </canvas>
 
   <!-- Table for monthly hours -->
   <table id="reportTable">
       <thead>
           <tr>
-              <th>Month</th>
+              <th>Client</th>
               <th>Total Hours Worked</th>
+              <th>Cost</th>
+              <th>Client Payment</th>
+              <th>Profit/Loss %</th>
+              <th>Detail Breakdown</th>
           </tr>
       </thead>
       <tbody id="reportTableBody">
           <!-- Table rows will be dynamically added here -->
       </tbody>
   </table>
+  
+
 
   <button class="gen-button" id="downloadReport">Download Report</button>
 </div>

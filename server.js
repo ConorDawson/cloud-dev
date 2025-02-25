@@ -16,14 +16,21 @@ const axios = require('axios');
 
 app.get('/api/client_hours', async (req, res) => {
   try {
-    // Call the Flask API endpoint to get client hours
-    const response = await axios.get('http://localhost:5001/api/client_hours');
-    res.json(response.data); // Send Flask data back to the client
+    // Get start & end dates from frontend request
+    const { start_date, end_date } = req.query;
+
+    // Call Flask API with the provided dates
+    const response = await axios.get('http://localhost:5001/api/client_hours', {
+      params: { start_date, end_date }
+    });
+
+    res.json(response.data); // Send Flask response to frontend
   } catch (err) {
     console.error('Error fetching client hours from Flask:', err);
     res.status(500).send('Server Error');
   }
 });
+
 
 
 app.get('/api/monthly_report', async (req, res) => {
