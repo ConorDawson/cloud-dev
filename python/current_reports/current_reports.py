@@ -1,5 +1,7 @@
 import psycopg2
 from flask import Flask, jsonify, request
+from dateutil.relativedelta import relativedelta
+from datetime import datetime
 
 # Database connection information
 DB_CONFIG = {
@@ -77,8 +79,7 @@ def process_client_data(rows):
     return client_data
 
 
-from dateutil.relativedelta import relativedelta
-from datetime import datetime
+
 
 def calculate_profit_loss(client_data, start_date, end_date):
     """
@@ -142,43 +143,6 @@ def prepare_final_data(client_data):
         })
     return data
 
-
-
-@app.route('/api/monthly_report', methods=['GET'])
-def get_monthly_report():
-    """
-    Fetches the monthly breakdown of hours worked for a specific client and year.
-    The client and year are provided as query parameters.
-    """
-    client = request.args.get('client')
-    year = request.args.get('year')
-
-    if not client or not year:
-        return jsonify({"error": "Client and Year parameters are required"}), 400
-
-    query = """
-    SELECT EXTRACT(MONTH FROM work_date) AS month, SUM(hours) AS total_hours
-    FROM timesheet_hours2
-    WHERE company_name = %s AND EXTRACT(YEAR FROM work_date) = %s
-    GROUP BY month
-    ORDER BY month;
-    """
-    
-    data = {}
-
-    try:
-        with psycopg2.connect(**DB_CONFIG) as conn:
-            with conn.cursor() as cursor:
-                cursor.execute(query, (client, year))
-                rows = cursor.fetchall()
-                for month, hours in rows:
-                    data[int(month)] = float(hours)
-                
-        
-    except Exception as e:
-        print(f"Error fetching data: {e}")
-
-    return jsonify(data)
 
 if __name__ == '__main__':
     app.run(port=5001)

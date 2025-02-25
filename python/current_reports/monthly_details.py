@@ -1,5 +1,7 @@
 import psycopg2
 from flask import Flask, jsonify, request
+from dateutil.relativedelta import relativedelta
+from datetime import datetime
 
 # Database connection information
 DB_CONFIG = {
@@ -25,33 +27,21 @@ def get_db_connection():
     )
     return conn
 
-def fetch_monthly_report():
-    """
-    Fetches the monthly breakdown of hours worked, cost, client payment, and profit/loss for a specific client and year.
-    The client and year are provided as query parameters.
-    """
-    client = request.args.get('client')
-    start_date = request.args.get('start_date')
-    end_date = request.args.get('end_date')
-
-    if not client or not start_date or not end_date:
-        return jsonify({"error": "Client, Start Date, and End Date parameters are required"}), 400
-
+def fetch_monthly_report(client, start_date, end_date):
     query = """
-SELECT 
-    th.employee_id,
-    TO_CHAR(th.work_date, 'YYYY-MM') AS month_year,
-    SUM(th.hours) AS total_hours,
-    SUM(th.hours * ep.employee_wage) AS total_cost,
-    cb.client_payment_amount,
-    cb.client_billing_schedule
-FROM timesheet_hours2 th
-LEFT JOIN employee_pay ep ON ep.employee_id = th.employee_id
-LEFT JOIN client_billing cb ON cb.client_id = (SELECT id FROM clients WHERE company_name = 'Creative Minds')
-WHERE th.company_name = %s AND th.work_date BETWEEN %s AND %s
-GROUP BY th.employee_id, month_year, cb.client_payment_amount, cb.client_billing_schedule
-ORDER BY th.employee_id, month_year;
-"""
+    SELECT 
+        TO_CHAR(th.work_date, 'YYYY-MM') AS month_year,
+        SUM(th.hours) AS total_hours,
+        SUM(th.hours * ep.employee_wage) AS total_cost,
+        cb.client_payment_amount,
+        cb.client_billing_schedule
+    FROM timesheet_hours2 th
+    LEFT JOIN employee_pay ep ON ep.employee_id = th.employee_id
+    LEFT JOIN client_billing cb ON cb.client_id = (SELECT id FROM clients WHERE company_name = %s)
+    WHERE th.company_name = %s AND th.work_date BETWEEN %s AND %s
+    GROUP BY month_year, cb.client_payment_amount, cb.client_billing_schedule
+    ORDER BY month_year;
+    """
     
     data = {}
 
@@ -61,22 +51,29 @@ ORDER BY th.employee_id, month_year;
                 cursor.execute(query, (client, client, start_date, end_date))  # Safe parameterized query
                 rows = cursor.fetchall()
                 
-                for month, total_hours, total_cost, client_payment, billing_schedule in rows:
+                start_dt = start_date if isinstance(start_date, datetime) else datetime.strptime(start_date, "%Y-%m-%d")
+                end_dt = end_date if isinstance(end_date, datetime) else datetime.strptime(end_date, "%Y-%m-%d")
+                months_selected = (end_dt.year - start_dt.year) * 12 + (end_dt.month - start_dt.month) + 1
+
+                for month_year, total_hours, total_cost, client_payment, billing_schedule in rows:
                     # Determine total payment based on billing schedule
-                    total_payment = 0
-                    if billing_schedule == 'A':
-                        total_payment = client_payment / 12
-                    elif billing_schedule == 'BA':
-                        total_payment = client_payment / 6
-                    elif billing_schedule == 'Q':
-                        total_payment = client_payment / 3
-                    elif billing_schedule == 'M':
-                        total_payment = client_payment
+                    billing_cycles = 0
+                    if billing_schedule == 'A':  # Paid once per 12 months
+                        billing_cycles = months_selected // 12
+                    elif billing_schedule == 'BA':  # Paid every 6 months
+                        billing_cycles = months_selected // 6
+                    elif billing_schedule == 'Q':  # Paid every 3 months
+                        billing_cycles = months_selected // 3
+                    elif billing_schedule == 'M':  # Paid every month
+                        billing_cycles = months_selected
+                    billing_cycles = max(1, billing_cycles)
+
+                    total_payment = client_payment * billing_cycles
                     
                     # Calculate profit/loss percentage
                     profit_loss_percentage = ((total_payment - total_cost) / total_cost) * 100 if total_cost != 0 else 0
                     
-                    data[int(month)] = {
+                    data[month_year] = {
                         "Total Hours Worked": float(total_hours),
                         "Total Cost": float(total_cost),
                         "Client Payment": float(total_payment),
@@ -87,6 +84,7 @@ ORDER BY th.employee_id, month_year;
         return jsonify({"error": "Internal server error"}), 500
 
     return jsonify(data)
+
 
 if __name__ == '__main__':
     app.run(port=5001)

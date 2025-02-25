@@ -31,19 +31,17 @@ app.get('/api/client_hours', async (req, res) => {
   }
 });
 
-
-
 app.get('/api/monthly_report', async (req, res) => {
-  const { client, year } = req.query;
+  const { client, start_date, end_date } = req.query;
 
-  if (!client || !year) {
-    return res.status(400).json({ error: "Client and Year parameters are required" });
+  if (!client || !start_date || !end_date) {
+    return res.status(400).json({ error: "Client, Start Date, and End Date parameters are required" });
   }
 
   try {
     // Call the Flask API endpoint to get the monthly report
     const response = await axios.get('http://localhost:5001/api/monthly_report', {
-      params: { client, year } // Pass client and year as query parameters
+      params: { client, start_date, end_date } // Pass client, start_date, and end_date as query parameters
     });
     res.json(response.data); // Send Flask data back to the client
   } catch (err) {
@@ -51,6 +49,7 @@ app.get('/api/monthly_report', async (req, res) => {
     res.status(500).send('Server Error');
   }
 });
+
 
 
 
@@ -129,13 +128,35 @@ app.post('/current', (req, res) => {
 });
 
 
-// Home Route (after successful login)
+// Home Route (before successful login)
 app.get('/home', (req, res) => {
   if (!req.session.user) {
     return res.redirect('/');
   }
   res.sendFile(path.join(__dirname, 'views/home.html'));
 });
+
+
+// Home Route (after successful login)
+app.post('/home', (req, res) => {
+  if (!req.session.user) {
+    return res.redirect('/');
+  }
+  res.sendFile(path.join(__dirname, 'views/home.html'));
+});
+
+
+
+// Home Route (after successful login)
+app.post('/predicted', (req, res) => {
+  if (!req.session.user) {
+    return res.redirect('/');
+  }
+  res.sendFile(path.join(__dirname, 'views/predicted_graphs.html'));
+});
+
+
+
 
 // API Endpoints
 app.get('/api/clients', async (req, res) => {

@@ -54,7 +54,7 @@ window.onload = async function () {
                 <td>€${cost}</td>
                 <td>€${clientPayment}</td>
                 <td>${profitLossPercentage}% ${profitLossSign}</td>
-                <td><button class="detailButton" data-client="${client.Client}">View Details</button></td>
+                <td><button class="detailButton" data-client="${client.Client}" data-start-date="${startDate}" data-end-date="${endDate}"><i class="fa-solid fa-circle-info"></i></button></td>
             `;
             tableBody.appendChild(row);
         });
@@ -63,12 +63,14 @@ window.onload = async function () {
         document.querySelectorAll('.detailButton').forEach(button => {
             button.addEventListener('click', function () {
                 const clientName = this.getAttribute("data-client");
-                showClientToast(clientName);
+                const startDate = this.getAttribute("data-start-date");
+                const endDate = this.getAttribute("data-end-date");
+                showClientToast(clientName, startDate, endDate);
             });
         });
     }
 
-    function showClientToast(clientName) {
+    function showClientToast(clientName, startDate, endDate) {
         // Create overlay if it doesn't exist
         let overlay = document.getElementById("toast-overlay");
         if (!overlay) {
@@ -76,7 +78,7 @@ window.onload = async function () {
             overlay.id = "toast-overlay";
             document.body.appendChild(overlay);
         }
-    
+
         // Create toast container if it doesn't exist
         let toastContainer = document.getElementById("toast-container");
         if (!toastContainer) {
@@ -84,12 +86,12 @@ window.onload = async function () {
             toastContainer.id = "toast-container";
             document.body.appendChild(toastContainer);
         }
-    
+
         // Create toast box
         let toast = document.createElement("div");
         toast.className = "toast show";
         toast.innerHTML = `
-            <strong>${clientName} Monthly Breakdown</strong>
+            <strong>${clientName} Monthly Breakdown Between ${startDate} and ${endDate}</strong>
             <table border="1" style="width: 100%; text-align: center; margin-top: 5px;">
                 <tr>
                     <th>Month</th>
@@ -98,31 +100,49 @@ window.onload = async function () {
                     <th>Client Payment</th>
                     <th>Profit/Loss %</th>
                 </tr>
+                <tbody id="toast-table-body">
+                </tbody>
             </table>
             <button class="close-toast">Close</button>
+            <button id="downloadDetailedReport">Download Report</button>
         `;
-    
+
         toastContainer.appendChild(toast);
         overlay.style.display = "block"; // Show overlay
-    
+
         // Close modal on button click
         toast.querySelector(".close-toast").addEventListener("click", function () {
             toast.classList.remove("show");
             overlay.style.display = "none"; // Hide overlay
             setTimeout(() => toast.remove(), 500); // Remove after animation
         });
-    
+
         // Close modal when clicking outside
         overlay.addEventListener("click", function () {
             toast.classList.remove("show");
             overlay.style.display = "none";
             setTimeout(() => toast.remove(), 500);
         });
+
+        // Fetch data from API and populate the table
+        fetch(`/api/monthly_report?client=${clientName}&start_date=${startDate}&end_date=${endDate}`)
+            .then(response => response.json())
+            .then(data => {
+                const tableBody = document.getElementById("toast-table-body");
+                for (let month in data) {
+                    const row = document.createElement("tr");
+                    row.innerHTML = `
+                        <td>${month}</td>
+                        <td>${data[month]["Total Hours Worked"]}</td>
+                        <td>${data[month]["Total Cost"]}</td>
+                        <td>${data[month]["Client Payment"]}</td>
+                        <td>${data[month]["Profit/Loss %"]}</td>
+                    `;
+                    tableBody.appendChild(row);
+                }
+            })
+            .catch(error => console.error('Error fetching data:', error));
     }
-    
-    
-        
-    
 
     // Load default data on page load
     updateTable(startOfYear, today);
@@ -139,4 +159,27 @@ window.onload = async function () {
 
         updateTable(selectedStartDate, selectedEndDate);
     });
+
+
+
+
+    // Download main table as CSV
+    document.getElementById('downloadReport').addEventListener('click', () => {
+        const table = document.getElementById('reportTable');
+        const rows = Array.from(table.rows).map(row => Array.from(row.cells).map(cell => cell.innerText));
+        const csvContent = rows.map(rowArray => rowArray.join(",")).join("\n");
+        const encodedUri = encodeURI("data:text/csv;charset=utf-8," + csvContent);
+    
+        const startDate = document.getElementById('startDate').value;
+        const endDate = document.getElementById('endDate').value;
+        const fileName = `Current_Profit_Loss_Percentages_for_${startDate}_to_${endDate}.xlsx`;
+    
+        const link = document.createElement('a');
+        link.setAttribute('href', encodedUri);
+        link.setAttribute('download', fileName);
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    });
+    
 };
