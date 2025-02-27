@@ -1,372 +1,142 @@
 body {
-  background-color: #ffffff;
+  width: 100%;
+  height: 100%;
+  background: conic-gradient(at 50% 25%, #0000 75%, #004d66 0),  /* Dark teal for a professional feel */
+    conic-gradient(at 50% 25%, #0000 75%, #004d66 0) 60px 60px, /* Matching teal color */
+    conic-gradient(at 50% 25%, #0000 75%, #004d66 0) calc(2 * 60px) calc(2 * 60px),
+    conic-gradient(at 50% 25%, #0000 75%, #004d66 0) calc(3 * 60px) calc(3 * 60px),
+    repeating-linear-gradient(135deg, #9ea9b7 0 12.5%, #6a7586 0 25%); /* A mix of muted greys and blues */
+  background-size: calc(4 * 60px) calc(4 * 60px);
 }
-  /* Card style wrapper for the table */
-  .card {
-    width: 90%;
-    max-width: 1200px;
-    height: auto;
-    background: #07182E;  /* Dark background for the card */
-    position: relative;
-    display: flex;
-    flex-direction: column;
-    place-content: center;
-    place-items: center;
-    overflow: hidden;
-    border-radius: 20px;
-    margin: 20px auto;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); /* Soft shadow for depth */
-    margin-top: 80px; /* Ensure card starts below the navbar */
-  }
-  
-  /* Card title styling */
-  .card h2 {
-    z-index: 1;
-    color: white;
-    font-size: 2em;
-    text-align: center;
-    padding: 15px;
-    margin: 0;
-  }
-  
-  /* Card background animation */
-  .card::before {
-    content: '';
-    position: absolute;
-    width: 100%;
-    background-image: linear-gradient(180deg, rgb(0, 183, 255), rgb(255, 48, 255));
-    height: 130%;
-    animation: rotBGimg 3s linear infinite;
-    transition: all 0.2s linear;
-  }
-  
-  @keyframes rotBGimg {
-    from {
-      transform: rotate(0deg);
-    }
-    to {
-      transform: rotate(360deg);
-    }
-  }
-  
-  .card::after {
-    content: '';
-    position: absolute;
-    background: #07182E;
-    inset: 5px;
-    border-radius: 15px;
-  }
-  
-  /* Timesheet container and table styling */
-  .timesheet-container {
-    display: flex;
-    flex-direction: column; /* Stack the table and the button */
-    justify-content: flex-start;
-    align-items: center;
-    margin: 20px;
-    z-index: 2;
-    position: relative; /* Allow button to be positioned below */
-    padding-top: 20px; /* Ensures content starts after navbar */
-  }
-  
-  .timesheet-table {
-    border-collapse: collapse;
-    width: 100%;
-    max-width: 100%;
-    background-color: #92AA83; /* Darker background for elegance */
-    color: #000000; /* Light text for readability */
-    border: 1.5px solid #149CEA; /* Dark teal border for consistency */
-  }
-  
-  .timesheet-table th,
-  .timesheet-table td {
-    border: 1.5px solid #149CEA; /* Matching border color */
-    padding: 12px;
-    text-align: center;
-    font-size: 1em;
-  }
-  
-  .timesheet-table th {
-    background-color: #149CEA; /* Dark teal header */
-    color: #e0e0e0; /* Light text for the header */
-    text-transform: uppercase;
-    letter-spacing: 1px;
-  }
-  
-  .timesheet-table td {
-    background-color: #333333; /* Dark background for cells */
-  }
-  
-  .timesheet-table td:hover {
-    background-color: #444444; /* Slight hover effect for cells */
-  }
-  
-  /* Input fields for the table cells */
-  .day-input {
-    width: 100%;
-    padding: 8px;
-    background: #333333; /* Dark input field background */
-    border: 1.5px solid #149CEA; /* Matching border color */
-    color: #e0e0e0; /* Light text inside the input */
-    border-radius: 5px;
-    text-align: center;
-    outline: none;
-    font-size: 1em;
-  }
-  
-  .day-input:focus {
-    border-color: #149CEA; /* Lighter teal for focus effect */
-    background-color: #444444; /* Darker background on focus */
-  }
-  
-  .day-input::placeholder {
-    color: #149CEA; /* Placeholder color to match the professional theme */
-  }
-  
-  
-  .button-container {
-    width: 100%;
-    display: flex;
-    justify-content: center;
-    margin-top: 20px; /* Adds space between the table and the submit button */
-  }
-  /* Submit button positioned below the table */
-  /* Apply the animation to buttons with the 'submit' class */
-  .submit {
-    width: 10em;
-    position: relative;
-    height: 3.5em;
-    border: 3px ridge #149CEA;
-    outline: none;
-    background-color: transparent;
-    color: white;
-    transition: 1s;
-    border-radius: 0.3em;
-    font-size: 16px;
-    font-weight: bold;
-    cursor: pointer;
-  }
-  
-  .submit::after {
-    content: "";
-    position: absolute;
-    top: -10px;
-    left: 3%;
-    width: 95%;
-    height: 40%;
-    background-color: #07182E;
-    transition: 0.5s;
-    transform-origin: center;
-  }
-  
-  .submit::before {
-    content: "";
-    transform-origin: center;
-    position: absolute;
-    top: 80%;
-    left: 3%;
-    width: 95%;
-    height: 40%;
-    background-color: #07182E;
-    transition: 0.5s;
-  }
-  
-  .submit:hover::before,
-  .submit:hover::after {
-    transform: scale(0);
-  }
-  
-  .submit:hover {
-    box-shadow: inset 0px 0px 25px #1479EA;
-  }
-  
-  
-  /* Navbar styling */
-  .navbar {
-    width: 100%;
-    background-color: #3d5164;
-    position: fixed;
-    top: 0;
-    left: 0;
-    z-index: 1000;
-    display: flex;
-    justify-content: center; /* Center the navbar items */
-    align-items: center;
-    padding: 10px 20px;
-  }
-  
-  /* Navbar link styling */
-  .navbar .navbar-links {
-    display: flex;
-    gap: 15px;
-  }
-  
-  .navbar .navbar-links a {
-    color: white;
-    text-decoration: none;
-    font-size: 18px;
-    font-weight: bold;
-    padding: 10px 15px;
-    transition: background-color 0.3s ease;
-  }
-  
-  .navbar .navbar-links a:hover {
-    background-color: #ff4d4d;
-    border-radius: 5px;
-  }
-  
-  .button {
-    position: relative;
-    width: 120px;
-    height: 40px;
-    background-color: #3d5164;
-    display: flex;
-    align-items: center;
-    color: white;
-    flex-direction: column;
-    justify-content: center;
-    border: none;
-    padding: 12px;
-    gap: 12px;
-    border-radius: 8px;
-    cursor: pointer;
-  }
-  
-  
-  
-  
-  
-  .navbar form {
-    margin-right: 15px; /* Adds space between each form */
-  }
-  
-  .navbar form:last-child {
-    margin-right: 0; /* Removes margin for the last form to prevent extra space */
-  }
-  
-  .navbar .button {
-    padding: 10px 20px; /* Adjust button padding if necessary */
-    font-size: 16px;
-  }
-  
-  .navbar .button {
-    margin-right: 15px; /* Adds space between buttons */
-  }
-  
-  .navbar .button:last-child {
-    margin-right: 0; /* Removes margin for the last button */
-  }
-  
 
+/* Navbar Styling */
+.navbar {
+  width: 100%;
+  background-color: #2b3e50;
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 1000;
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  padding: 15px 0;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
 
-
-  /* From Uiverse.io by cssbuttons-io */ 
-  .gen-button {
-  --color: #FF6B01;
-  font-family: inherit;
-  display: inline-block;
-  width: 8em;
-  height: 2.6em;
-  line-height: 2.5em;
-  margin: 20px;
-  position: relative;
+.navbar .button {
+  padding: 10px 20px;
+  background-color: #6c7d92;
+  color: white;
+  font-size: 16px;
+  border-radius: 5px;
+  border: none;
   cursor: pointer;
-  overflow: hidden;
-  border: 2px solid var(--color);
-  transition: color 0.5s;
-  z-index: 1;
-  font-size: 17px;
-  border-radius: 6px;
-  font-weight: 500;
-  color: var(--color);
+  transition: background-color 0.3s ease;
 }
 
-.gen-button:before {
-  content: "";
-  position: absolute;
-  z-index: -1;
-  background: var(--color);
-  height: 150px;
-  width: 200px;
-  border-radius: 50%;
+.navbar .button:hover {
+  background-color: #3d5164;
 }
 
-.gen-button:hover {
-  color: #fff;
-}
-
-.gen-button:before {
-  top: 100%;
-  left: 100%;
-  transition: all 0.7s;
-}
-
-.gen-button:hover:before {
-  top: -30px;
-  left: -30px;
-}
-
-.gen-button:active:before {
-  background: #320331;
-  transition: background 0s;
-}
-
-
-
-/* From Uiverse.io by Yaseen549 */ 
+/* Main Container Styling */
 .reports_card {
   margin-top: 100px;
   margin-left: 10%;
-  padding: 20px;
+  padding: 30px;
   width: 80%;
-  border-radius: 30px;
-  background: #5E6572;
-  box-shadow: 15px 15px 30px rgb(25, 25, 25),
-              -15px -15px 30px rgb(60, 60, 60);
- }
- 
-
- #clientHoursChart {
-  margin-top: 20px;
+  border-radius: 15px;
+  background: #ffffff;
+  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
 }
 
-table {
+/* Table Styling */
+Table {
+  box-shadow: 8px 8px 8px 8px rgba(0, 0.2, 0.2, 0.2); /* Light shadow for the table */
+
   width: 100%;
-  margin-top: 20px;
+  margin-top: 30px;
   border-collapse: collapse;
 }
 
-table th, table td {
-  border: 1px solid #555555; /* Medium gray border */
-  padding: 10px;
+Table th,
+Table td {
+  padding: 12px;
   text-align: center;
+  font-size: 1em;
 }
 
-table th {
-  background-color: #320331; 
-  color: #ffffff;;
+Table th {
+  background-color: #3d5164;
+  color: #ffffff;
+  text-transform: uppercase;
+  letter-spacing: 1px;
 }
 
-table td {
-  background-color: #ffffff; /* Very dark gray background for table cells */
+Table td {
+  background-color: #f8f9fa;
+  color: #333;
+  border: 1px solid #dee2e6;
 }
 
-#reportHeading {
-  color: #ffffff; /* White text color */
-  font-size: 1.5em;
-  text-align: center;
-  margin-top: 20px;
+Table td:hover {
+  background-color: #e9ecef;
 }
- 
 
-#client, #year {
-  width: 100%;
-  padding: 10px;
-  margin: 10px 0;
-  border: 1px solid #555555; /* Medium gray border */
+/* Generate Button */
+.gen-button {
+  width: 180px;
+  height: 45px;
+  background-color: #28a745;
+  color: white;
+  border: none;
   border-radius: 5px;
-  box-sizing: border-box;
+  font-size: 16px;
+  cursor: pointer;
+  margin-top: 20px;
+  display: inline-block;
+  transition: background-color 0.3s ease;
 }
+
+.gen-button:hover {
+  background-color: #218838;
+}
+
+/* Input Fields Styling */
+.date {
+  padding: 10px;
+  font-size: 16px;
+  border: 2px solid #ddd;
+  border-radius: 5px;
+  margin: 5px 10px;
+}
+
+.date:focus {
+  border-color: #3d5164;
+  outline: none;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .navbar {
+    flex-direction: column;
+    padding: 20px 0;
+  }
+
+  .navbar .button {
+    margin: 5px 0;
+  }
+
+  .reports_card {
+    margin-left: 5%;
+    width: 90%;
+  }
+
+  #reportTable {
+    font-size: 0.9em;
+  }
+}
+
 
 /* Modal styling */
 .toast {
@@ -412,4 +182,73 @@ table td {
   width: 100%;
   text-align: center;
   border-radius: 4px;
+}
+
+
+
+
+@media (max-width: 768px) {
+  .timesheet-table th,
+  .timesheet-table td {
+    padding: 6px;
+    font-size: 0.8em; /* Adjust font size on smaller screens */
+  }
+
+  .timesheet-table {
+    min-width: 600px;  /* Ensure the table width is still usable on small screens */
+  }
+}
+
+.timesheet-table input {
+  width: 100px;
+  border: none;
+  outline: none;
+  border-radius: 15px;
+  padding: 1em;
+  background-color: #ccc;
+  box-shadow: inset 2px 5px 10px rgba(0,0,0,0.3);
+  transition: 300ms ease-in-out;
+  text-align: center; 
+}
+
+.timesheet-table input:focus {
+  border-color: #007bff; /* Highlight the border when focused */
+  outline: none; /* Remove the default outline */
+  background-color: #f0f8ff; /* Change the background color on focus */
+}
+
+.timesheet-table input:disabled {
+  background-color: #e9ecef; /* Grey background for disabled inputs */
+  cursor: not-allowed; /* Show a 'not allowed' cursor */
+}
+
+.timesheet-table td {
+  position: relative;
+  padding: 10px;
+}
+
+/* Optional: Add a hover effect to inputs */
+.timesheet-table input:hover {
+  background-color: #f9f9f9;
+}
+
+
+/* Style buttons inside .button-container */
+.button-container button {
+  width: 180px;
+  height: 45px;
+  background-color: #28a745;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  font-size: 16px;
+  cursor: pointer;
+  margin-top: 20px;
+  display: inline-block;
+  transition: background-color 0.3s ease;
+}
+
+/* Optional: Style buttons on hover */
+.button-container button:hover {
+  background-color: #218838; /* Darker shade for hover */
 }

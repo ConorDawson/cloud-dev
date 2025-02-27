@@ -56,27 +56,27 @@ def fetch_monthly_report(client, start_date, end_date):
                 months_selected = (end_dt.year - start_dt.year) * 12 + (end_dt.month - start_dt.month) + 1
 
                 for month_year, total_hours, total_cost, client_payment, billing_schedule in rows:
-                    # Determine total payment based on billing schedule
-                    billing_cycles = 0
-                    if billing_schedule == 'A':  # Paid once per 12 months
-                        billing_cycles = months_selected // 12
+                    # Determine the number of payments per year
+                    payments_per_year = 12  # Default to annual billing
+                    if billing_schedule == 'A':  # Paid every 6 months
+                        payments_per_year = 12
                     elif billing_schedule == 'BA':  # Paid every 6 months
-                        billing_cycles = months_selected // 6
+                        payments_per_year = 6
                     elif billing_schedule == 'Q':  # Paid every 3 months
-                        billing_cycles = months_selected // 3
+                        payments_per_year = 3
                     elif billing_schedule == 'M':  # Paid every month
-                        billing_cycles = months_selected
-                    billing_cycles = max(1, billing_cycles)
+                        payments_per_year = 1
 
-                    total_payment = client_payment * billing_cycles
-                    
+                    # Adjust client payment amount to a monthly value
+                    monthly_payment = client_payment / payments_per_year
+
                     # Calculate profit/loss percentage
-                    profit_loss_percentage = ((total_payment - total_cost) / total_cost) * 100 if total_cost != 0 else 0
+                    profit_loss_percentage = ((monthly_payment - total_cost) / total_cost) * 100 if total_cost != 0 else 0
                     
                     data[month_year] = {
                         "Total Hours Worked": float(total_hours),
                         "Total Cost": float(total_cost),
-                        "Client Payment": float(total_payment),
+                        "Client Payment": float(monthly_payment),
                         "Profit/Loss %": float(profit_loss_percentage)
                     }
     except Exception as e:
@@ -84,7 +84,6 @@ def fetch_monthly_report(client, start_date, end_date):
         return jsonify({"error": "Internal server error"}), 500
 
     return jsonify(data)
-
 
 if __name__ == '__main__':
     app.run(port=5001)

@@ -32,43 +32,142 @@ window.onload = async function () {
         }
     }
 
+
+
+    
+    
     async function updateTable(startDate, endDate) {
         tableBody.innerHTML = ''; // Clear previous data
         const clientData = await fetchClientHours(startDate, endDate);
-
-        clientData.forEach((client) => {
-            // Calculate rounded profit/loss percentage and add an arrow
-            const profitLossPercentage = parseFloat(client['Profit/Loss %']).toFixed(2);
-            const profitLossSign = profitLossPercentage > 0 ? '↑' : profitLossPercentage < 0 ? '↓' : '';
-            const profitLossColor = profitLossPercentage > 0 ? 'green' : profitLossPercentage < 0 ? 'red' : 'black';
-            const profitLossStyle = `color: ${profitLossColor}; font-weight: bold;`;
-
-            const clientName = 'client.Client; font-weight: bold;';
-            const clientPayment = parseFloat(client['Client Payment']).toFixed(2);
-            const cost = parseFloat(client.Cost).toFixed(2);
-            const totalHoursWorked = parseFloat(client['Total Hours Worked']).toFixed(1);
-            const row = document.createElement('tr');
-            row.innerHTML = `
-                <td>${client.Client}</td>
-                <td>${totalHoursWorked}</td>
-                <td>€${cost}</td>
-                <td>€${clientPayment}</td>
-                <td>${profitLossPercentage}% ${profitLossSign}</td>
-                <td><button class="detailButton" data-client="${client.Client}" data-start-date="${startDate}" data-end-date="${endDate}"><i class="fa-solid fa-circle-info"></i></button></td>
-            `;
-            tableBody.appendChild(row);
-        });
-
-        // Add event listeners for the "View Details" buttons
-        document.querySelectorAll('.detailButton').forEach(button => {
-            button.addEventListener('click', function () {
-                const clientName = this.getAttribute("data-client");
-                const startDate = this.getAttribute("data-start-date");
-                const endDate = this.getAttribute("data-end-date");
-                showClientToast(clientName, startDate, endDate);
+        
+        let allHoursWorked = 0;
+        let totalCost = 0;
+        let totalClientPayment = 0;
+        
+        // Function to sort data
+        const sortData = (data, column, isAscending) => {
+            return data.sort((a, b) => {
+                let aValue = a[column];
+                let bValue = b[column];
+    
+                // Convert values to numbers if they are numeric
+                if (!isNaN(aValue) && !isNaN(bValue)) {
+                    aValue = parseFloat(aValue);
+                    bValue = parseFloat(bValue);
+                }
+    
+                // Handle string and number sorting
+                if (typeof aValue === 'string' && typeof bValue === 'string') {
+                    return isAscending 
+                        ? aValue.localeCompare(bValue) 
+                        : bValue.localeCompare(aValue);
+                } else {
+                    return isAscending ? aValue - bValue : bValue - aValue;
+                }
             });
+        };
+    
+        // Dropdown element for sorting
+        const sortDropdown = document.getElementById('sortDropdown');
+        let isAscending = true;
+    
+        // Listen for changes in the dropdown
+        sortDropdown.addEventListener('change', () => {
+            const column = sortDropdown.value;
+            isAscending = !isAscending; // Toggle ascending/descending every time the dropdown is changed
+            const sortedData = sortData(clientData, column, isAscending);
+            renderTable(sortedData);
         });
+        
+        // Function to render sorted data
+        function renderTable(sortedData) {
+            tableBody.innerHTML = ''; // Clear existing rows before rendering sorted ones
+            let allHoursWorked = 0;
+            let totalCost = 0;
+            let totalClientPayment = 0;
+    
+            sortedData.forEach((client) => {
+                // Parse numerical values safely
+                const totalHoursWorked = parseFloat(client['Total Hours Worked']) || 0;
+                const cost = parseFloat(client.Cost) || 0;
+                const clientPayment = parseFloat(client['Client Payment']) || 0;
+        
+                // Accumulate totals
+                allHoursWorked += totalHoursWorked;
+                totalCost += cost;
+                totalClientPayment += clientPayment;
+        
+                // Calculate rounded profit/loss percentage with arrow sign
+                const profitLossPercentage = ((clientPayment - cost) / (cost || 1)) * 100;
+                const profitLossSign = profitLossPercentage > 0 ? '↑' : profitLossPercentage < 0 ? '↓' : '';
+                const profitLossColor = profitLossPercentage > 0 ? 'green' : profitLossPercentage < 0 ? 'red' : 'black';
+                const profitLossStyle = `color: ${profitLossColor}; font-weight: bold;`;
+        
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${client.Client}</td>
+                    <td>${totalHoursWorked.toFixed(1)}</td>
+                    <td>€${cost.toFixed(2)}</td>
+                    <td>€${clientPayment.toFixed(2)}</td>
+                    <td style="${profitLossStyle}">${profitLossPercentage.toFixed(2)}% ${profitLossSign}</td>
+                    <td><button class="detailButton" data-client="${client.Client}" data-start-date="${startDate}" data-end-date="${endDate}"><i class="fa-solid fa-circle-info"></i></button></td>
+                `;
+                tableBody.appendChild(row);
+            });
+    
+            // Test negative value for demonstration
+            const testnegative = -1000;
+            const testProfitLossPercentage = ((testnegative - 1000) / (1000 || 1)) * 100;
+            const testProfitLossColor = testProfitLossPercentage < 0 ? 'red' : 'green';
+            const testProfitLossStyle = `color: ${testProfitLossColor}; font-weight: bold;`;
+    
+            const testRow = document.createElement('tr');
+            testRow.innerHTML = `
+                <td>Test</td>
+                <td>Test</td>
+                <td>Test</td>
+                <td>Test</td>
+                <td style="${testProfitLossStyle}">${testProfitLossPercentage.toFixed(2)}%</td>
+                <td>Test</td>
+            `;
+            tableBody.appendChild(testRow);
+    
+            // Calculate overall profit/loss percentage
+            const totalProfitLossPercentage = ((totalClientPayment - totalCost) / (totalCost || 1)) * 100;
+            const totalProfitLossSign = totalProfitLossPercentage > 0 ? '↑' : totalProfitLossPercentage < 0 ? '↓' : '';
+            const totalProfitLossColor = totalProfitLossPercentage > 0 ? 'green' : totalProfitLossPercentage < 0 ? 'red' : 'black';
+            const totalProfitLossStyle = `color: ${totalProfitLossColor}; font-weight: bold;`;
+        
+            // Create and append the total row
+            const totalRow = document.createElement('tr');
+            totalRow.innerHTML = `
+                <td><strong>Total</strong></td>
+                <td><strong>${allHoursWorked.toFixed(1)}</strong></td>
+                <td><strong>€${totalCost.toFixed(2)}</strong></td>
+                <td><strong>€${totalClientPayment.toFixed(2)}</strong></td> 
+                <td style="${totalProfitLossStyle}"><strong>${totalProfitLossPercentage.toFixed(2)}% ${totalProfitLossSign}</strong></td>
+                <td></td>
+            `;
+            tableBody.appendChild(totalRow);
+        
+            // Add event listeners for "View Details" buttons
+            document.querySelectorAll('.detailButton').forEach(button => {
+                button.addEventListener('click', function () {
+                    const clientName = this.getAttribute("data-client");
+                    const startDate = this.getAttribute("data-start-date");
+                    const endDate = this.getAttribute("data-end-date");
+                    showClientToast(clientName, startDate, endDate);
+                });
+            });
+        }
+    
+        // Initially render the table with unsorted data
+        renderTable(clientData);
     }
+    
+    
+    
+        
 
     function showClientToast(clientName, startDate, endDate) {
         // Create overlay if it doesn't exist

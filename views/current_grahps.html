@@ -44,9 +44,17 @@
    <input type="date" id="endDate" class="date">
     <button class="gen-button" id="generateReport"> <i class="fa-solid fa-table-list"></i> Generate Report</button>
 
+
+    <select id="sortDropdown">
+      <option value="Client">Client</option>
+      <option value="Total Hours Worked">Total Hours Worked</option>
+      <option value="Cost">Cost</option>
+      <option value="Client Payment">Client Payment</option>
+      <option value="Profit/Loss">Profit/Loss</option>
+    </select>
+    
   
-  <!-- Table for monthly hours -->
-  <table id="reportTable">
+    <table id="reportTable">
       <thead>
           <tr>
               <th>Client</th>
@@ -59,8 +67,10 @@
       </thead>
       <tbody id="reportTableBody">
           <!-- Table rows will be dynamically added here -->
+          
       </tbody>
   </table>
+  
   
 
 
