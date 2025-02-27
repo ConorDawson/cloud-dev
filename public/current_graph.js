@@ -164,6 +164,125 @@ window.onload = async function () {
         // Initially render the table with unsorted data
         renderTable(clientData);
     }
+
+       
+    
+      
+    
+        async function createCharts(startDate, endDate) {
+            const clientData = await fetchClientHours(startDate, endDate);
+            
+            console.log("Client Data:", clientData); // Debugging: Check fetched data
+
+            document.querySelector('.paymentsChartHeader').innerText = "Client Payments (€)";
+            document.querySelector('.profitLossChartHeader').innerText = "Profit/Loss Percentage (%)";
+            document.querySelector('.costChartHeader').innerText = "Cost Distribution (€)";
+    
+            const clients = clientData.map(client => client.Client);
+            const hoursWorked = clientData.map(client => parseFloat(client['Total Hours Worked']) || 0);
+            const costs = clientData.map(client => parseFloat(client.Cost) || 0);
+            const payments = clientData.map(client => parseFloat(client['Client Payment']) || 0);
+            const profitLossPercentages = clientData.map(client => {
+                const profitLossPercentage = ((parseFloat(client['Client Payment']) - parseFloat(client.Cost)) / (parseFloat(client.Cost) || 1)) * 100;
+                return profitLossPercentage.toFixed(2);
+            });
+    
+            console.log("Clients:", clients); // Debugging: Check mapped data
+            console.log("Payments:", payments);
+            console.log("Profit/Loss Percentages:", profitLossPercentages);
+    
+            // Bar Chart for Client Payments
+            const paymentsChartContext = document.getElementById('paymentsChart').getContext('2d');
+            new Chart(paymentsChartContext, {
+                type: 'bar',
+                data: {
+                    labels: clients,
+                    datasets: [{
+                        label: 'Client Payments (€)',
+                        data: payments,
+                        backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                        borderColor: 'rgba(54, 162, 235, 1)',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+    
+            // Line Chart for Profit/Loss Percentage
+            const profitLossChartContext = document.getElementById('profitLossChart').getContext('2d');
+            new Chart(profitLossChartContext, {
+                type: 'line',
+                data: {
+                    labels: clients,
+                    datasets: [{
+                        label: 'Profit/Loss Percentage (%)',
+                        data: profitLossPercentages,
+                        borderColor: 'rgb(227, 125, 227)',
+                        borderWidth: 2,
+                        fill: false
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+    
+            // Pie Chart for Cost Distribution
+            const costChartContext = document.getElementById('costChart').getContext('2d');
+            new Chart(costChartContext, {
+                type: 'pie',
+                data: {
+                    labels: clients,
+                    datasets: [{
+                        label: 'Costs (€)',
+                        data: costs,
+                        backgroundColor: [
+                            'rgba(255, 99, 132, 0.6)',
+                            'rgba(54, 162, 235, 0.6)',
+                            'rgba(255, 206, 86, 0.6)',
+                            'rgba(75, 192, 192, 0.6)',
+                            'rgba(153, 102, 255, 0.6)',
+                            'rgba(255, 159, 64, 0.6)',
+                            'rgba(199, 199, 199, 0.6)',
+                            'rgba(83, 102, 255, 0.6)',
+                            'rgba(183, 159, 64, 0.6)'
+                        ],
+                        borderColor: [
+                            'rgba(255, 99, 132, 1)',
+                            'rgba(54, 162, 235, 1)',
+                            'rgba(255, 206, 86, 1)',
+                            'rgba(75, 192, 192, 1)',
+                            'rgba(153, 102, 255, 1)',
+                            'rgba(255, 159, 64, 1)',
+                            'rgba(199, 199, 199, 1)',
+                            'rgba(83, 102, 255, 1)',
+                            'rgba(183, 159, 64, 1)'
+                        ],
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true
+                }
+            });
+            
+        }
+        
+        const startDate = document.getElementById('startDate').value;
+        const endDate = document.getElementById('endDate').value;
+        createCharts(startDate, endDate);
     
     
     

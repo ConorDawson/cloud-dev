@@ -39,12 +39,13 @@
 
   <div class="reports_card">
   <h1 id="reportHeading">Current Profit and Loss Per Client</h1>
-
+    <label for="startDate">Start Date:</label>
    <input type="date" id="startDate" class="date">
+   <label for="endDate">End Date:</label>
    <input type="date" id="endDate" class="date">
     <button class="gen-button" id="generateReport"> <i class="fa-solid fa-table-list"></i> Generate Report</button>
 
-
+    <label for="sortDropdown">Sort By:</label>
     <select id="sortDropdown">
       <option value="Client">Client</option>
       <option value="Total Hours Worked">Total Hours Worked</option>
@@ -53,6 +54,20 @@
       <option value="Profit/Loss">Profit/Loss</option>
     </select>
     
+    <div class="charts-container">
+      <span class ="paymentsChartDiv">
+    <h1 class ="paymentsChartHeader"></h1>
+    <canvas id="paymentsChart"></canvas>
+    </span>
+    <span class ="profitLossChartDiv">
+    <h1 class ="profitLossChartHeader"></h1>
+    <canvas id="profitLossChart"></canvas>
+    </span>
+    <span class ="costChartDiv">
+    <h1 class ="costChartHeader"></h1>
+    <canvas id="costChart"></canvas>
+    </span>
+</div>
   
     <table id="reportTable">
       <thead>
@@ -70,10 +85,7 @@
           
       </tbody>
   </table>
-  
-  
-
-
+    
   <button class="gen-button" id="downloadReport">Download Report</button>
 </div>
 
