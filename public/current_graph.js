@@ -105,7 +105,7 @@ window.onload = async function () {
         
                 const row = document.createElement('tr');
                 row.innerHTML = `
-                    <td>${client.Client}</td>
+                    <td class ="clientName"><strong>${client.Client}</strong></td>
                     <td>${totalHoursWorked.toFixed(1)}</td>
                     <td>€${cost.toFixed(2)}</td>
                     <td>€${clientPayment.toFixed(2)}</td>
@@ -141,7 +141,7 @@ window.onload = async function () {
             // Create and append the total row
             const totalRow = document.createElement('tr');
             totalRow.innerHTML = `
-                <td><strong>Total</strong></td>
+                <td ><strong>Total</strong></td>
                 <td><strong>${allHoursWorked.toFixed(1)}</strong></td>
                 <td><strong>€${totalCost.toFixed(2)}</strong></td>
                 <td><strong>€${totalClientPayment.toFixed(2)}</strong></td> 

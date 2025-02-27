@@ -2,9 +2,6 @@ let currentWeekStartDate = new Date();
 // Assuming 'window.location.search' has the query string
 const urlParams = new URLSearchParams(window.location.search);
 
-sessionStorage.setItem("lastname", urlParams.get('employee_surname'));
-sessionStorage.setItem("firstname", urlParams.get('employee_forename'));
-sessionStorage.setItem("employee_id", urlParams.get('employee_id'));
 
 console.log(sessionStorage.getItem("lastname") + " " + sessionStorage.getItem("firstname") + " " + sessionStorage.getItem("employee_id"));
 

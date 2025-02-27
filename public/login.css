@@ -242,6 +242,6 @@
       conic-gradient(at 50% 25%, #0000 75%, #004d66 0) 60px 60px, /* Matching teal color */
       conic-gradient(at 50% 25%, #0000 75%, #004d66 0) calc(2 * 60px) calc(2 * 60px),
       conic-gradient(at 50% 25%, #0000 75%, #004d66 0) calc(3 * 60px) calc(3 * 60px),
-      repeating-linear-gradient(135deg, #9ea9b7 0 12.5%, #6a7586 0 25%); /* A mix of muted greys and blues */
+      repeating-linear-gradient(135deg, #9ea9b7 0 12.5%, #866a78 0 25%); /* A mix of muted greys and blues */
     background-size: calc(4 * 60px) calc(4 * 60px);
   }  

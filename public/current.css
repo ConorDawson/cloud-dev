@@ -73,6 +73,19 @@ Table th {
   letter-spacing: 1px;
 }
 
+.clientName{
+  background-color: #3d5164;
+  color: #ffffff;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.clientName:hover{
+  background-color: #ffffff;
+  color: #000000;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
 Table td {
   background-color: #f8f9fa;
   color: #333;
@@ -277,7 +290,7 @@ canvas.paymentsChartDiv, canvas.profitLossChartDiv, canvas.costChartDiv {
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
   border-radius: 8px;
   align-content: center;
-  
+
 }
 
 
@@ -291,16 +304,7 @@ h1.costChartHeader {
   text-align: center;
 }
 
-canvas{
-  max-width: 600px;
-  max-height: 375px;
-  width: 100%;
-  height: 100%;
-  margin: 20px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-  border-radius: 8px;
-  align-content: center;
-}
+
 
 
 
