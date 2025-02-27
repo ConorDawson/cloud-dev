@@ -170,6 +170,10 @@ window.onload = async function () {
       
     
         async function createCharts(startDate, endDate) {
+            //destroy the previous chart
+            Chart.helpers.each(Chart.instances, function(instance){
+                instance.destroy();
+            });
             const clientData = await fetchClientHours(startDate, endDate);
             
             console.log("Client Data:", clientData); // Debugging: Check fetched data
@@ -376,6 +380,7 @@ window.onload = async function () {
         }
 
         updateTable(selectedStartDate, selectedEndDate);
+        createCharts(selectedStartDate, selectedEndDate);
     });
 
 
