@@ -63,6 +63,7 @@ app.use(session({
   cookie: { secure: false } // Set to true in production with HTTPS
 }));
 
+
 // Middleware for JSON and URL-encoded parsing
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -126,6 +127,16 @@ app.post('/current', (req, res) => {
   }
   res.sendFile(path.join(__dirname, 'views/current_grahps.html'));
 });
+
+
+// Handle Current Graph Route
+app.post('/my_report', (req, res) => {
+  if (!req.session.user) {
+    return res.redirect('/');
+  }
+  res.sendFile(path.join(__dirname, 'views/my_report.html'));
+});
+
 
 
 // Home Route (before successful login)

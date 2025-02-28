@@ -3,11 +3,95 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Login</title>
-  <link rel="stylesheet" href="/login.css">
+  <title>Current Graphs</title>
+  <link rel="stylesheet" href="/current.css">
+
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script> <!-- Axios -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script> <!-- Chart.js -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.16.9/xlsx.full.min.js"></script> <!-- XLSX -->
+  <script src="/current_graph.js" defer></script> 
 </head>
 <body class="container">
- <h1>Predicted GRAPHS</h1>
+
+  <div class="navbar">
+   
+    <form action="/logout" method="POST">
+      <button type="submit" class="button">Logout</button>
+    </form>
+    
+    <form action="/current" method="POST">
+      <button type="submit" class="button">Current Reports</button>
+    </form>
+
+    <form action="/home" method="POST">
+      <button type="submit" class="button"> My Timesheet</button>
+    </form>
+    <form action="/my_report" method="POST">
+      <button type="submit" class="button">My Work Breakdown</button>
+    </form>
+    <form action="/predicted" method="POST">
+      <button type="submit" class="button">Predictive Reports</button>
+    </form>
+    <form action="/logout" method="POST">
+      <button type="submit" class="button">Employee Reports</button>
+    </form>
   </div>
+
+  <div class="reports_card">
+  <h1 id="reportHeading">Predicted Profit and Loss Per Client</h1>
+    <label for="startDate">Start Date:</label>
+   <input type="date" id="startDate" class="date">
+   <label for="endDate">End Date:</label>
+   <input type="date" id="endDate" class="date">
+    <button class="gen-button" id="generateReport"> <i class="fa-solid fa-table-list"></i> Generate Report</button>
+
+    <label for="sortDropdown">Sort By:</label>
+    <select id="sortDropdown">
+      <option value="Client">Client</option>
+      <option value="Total Hours Worked">Total Hours Worked</option>
+      <option value="Cost">Cost</option>
+      <option value="Client Payment">Client Payment</option>
+      <option value="Profit/Loss">Profit/Loss</option>
+    </select>
+    
+    <div class="charts-container">
+    <h1 class ="paymentsChartHeader"></h1>
+    <canvas id="paymentsChart"></canvas>
+    
+    <h1 class ="profitLossChartHeader"></h1>
+    <canvas id="profitLossChart"></canvas>
+    
+    <h1 class ="costChartHeader"></h1>
+    <canvas id="costChart"></canvas>
+</div>
+  
+    <table id="reportTable">
+      <thead>
+          <tr>
+              <th>Client</th>
+              <th>Total Hours Worked</th>
+              <th>Cost</th>
+              <th>Client Payment</th>
+              <th>Profit/Loss %</th>
+              <th>Detail Breakdown</th>
+          </tr>
+      </thead>
+      <tbody id="reportTableBody">
+          <!-- Table rows will be dynamically added here -->
+          
+      </tbody>
+  </table>
+    
+  <button class="gen-button" id="downloadReport">Download Report</button>
+</div>
+
+<!-- Canvas for the chart -->
+<div id="t" class="toast">
+  <div class="toast-content">
+      <h2 id="modalTitle"></h2>
+      <div id="modalBody"></div>
+  </div>
+</div>
 </body>
 </html>

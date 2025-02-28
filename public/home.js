@@ -1,9 +1,15 @@
+
 let currentWeekStartDate = new Date();
 // Assuming 'window.location.search' has the query string
 const urlParams = new URLSearchParams(window.location.search);
 
 
-console.log(sessionStorage.getItem("lastname") + " " + sessionStorage.getItem("firstname") + " " + sessionStorage.getItem("employee_id"));
+sessionStorage.setItem("firstname" , urlParams.get('employee_forename'));
+sessionStorage.setItem("lastname" , urlParams.get('employee_surname'));
+sessionStorage.setItem("employee_id" , urlParams.get('employee_id'));
+
+
+
 
 function fetchEmployeeName() {
     const urlParams = new URLSearchParams(window.location.search);
@@ -14,6 +20,9 @@ function fetchEmployeeName() {
         document.getElementById('employee-name').textContent = `Timesheet for ${forename} ${surname}`;
     }
 }
+
+console.log(sessionStorage.getItem("firstname") + " " + sessionStorage.getItem("lastname") + " " + sessionStorage.getItem("employee_id"));
+
 
 async function fetchClients() {
     try {

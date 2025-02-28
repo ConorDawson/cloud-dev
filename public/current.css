@@ -46,7 +46,7 @@ body {
   padding: 30px;
   width: 80%;
   border-radius: 15px;
-  background: #ffffff;
+  background: #c1c7cf;
   box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
 }
 
@@ -72,6 +72,7 @@ Table th {
   text-transform: uppercase;
   letter-spacing: 1px;
 }
+
 
 .clientName{
   background-color: #3d5164;
@@ -268,6 +269,7 @@ Table td:hover {
 
 
 .charts-container {
+  background: #ffffff;
   display: flex;
   flex-wrap: wrap;
   flex-direction: row;

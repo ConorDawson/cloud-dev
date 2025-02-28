@@ -21,7 +21,10 @@ window.onload = async function () {
 
     async function fetchClientHours(startDate, endDate) {
         try {
+            console.log("Start Date:", startDate);
+            console.log("End Date:", endDate);
             const response = await axios.get(`/api/client_hours`, {
+               
                 params: { start_date: startDate, end_date: endDate }
             });
             console.log("Client data fetched successfully:", response.data);
@@ -119,15 +122,16 @@ window.onload = async function () {
             const testnegative = -1000;
             const testProfitLossPercentage = ((testnegative - 1000) / (1000 || 1)) * 100;
             const testProfitLossColor = testProfitLossPercentage < 0 ? 'red' : 'green';
+            const testProfitLossSign = testProfitLossPercentage > 0 ? '↑' : testProfitLossPercentage < 0 ? '↓' : '';
             const testProfitLossStyle = `color: ${testProfitLossColor}; font-weight: bold;`;
     
             const testRow = document.createElement('tr');
             testRow.innerHTML = `
+                <td class ="clientName">Test</td>
                 <td>Test</td>
                 <td>Test</td>
                 <td>Test</td>
-                <td>Test</td>
-                <td style="${testProfitLossStyle}">${testProfitLossPercentage.toFixed(2)}%</td>
+                <td style="${testProfitLossStyle}">${testProfitLossPercentage.toFixed(2)}%${testProfitLossSign}</td>
                 <td>Test</td>
             `;
             tableBody.appendChild(testRow);
@@ -170,13 +174,13 @@ window.onload = async function () {
       
     
         async function createCharts(startDate, endDate) {
-            //destroy the previous chart
+            
             Chart.helpers.each(Chart.instances, function(instance){
                 instance.destroy();
             });
             const clientData = await fetchClientHours(startDate, endDate);
             
-            console.log("Client Data:", clientData); // Debugging: Check fetched data
+            console.log("Client Data:", clientData); 
 
             document.querySelector('.paymentsChartHeader').innerText = "Client Payments (€)";
             document.querySelector('.profitLossChartHeader').innerText = "Profit/Loss Percentage (%)";
@@ -191,7 +195,7 @@ window.onload = async function () {
                 return profitLossPercentage.toFixed(2);
             });
     
-            console.log("Clients:", clients); // Debugging: Check mapped data
+            console.log("Clients:", clients); 
             console.log("Payments:", payments);
             console.log("Profit/Loss Percentages:", profitLossPercentages);
     
@@ -213,7 +217,8 @@ window.onload = async function () {
                     responsive: true,
                     scales: {
                         y: {
-                            beginAtZero: true
+                            beginAtZero: true,
+                            indexAxis: '1000'
                         }
                     }
                 }
@@ -330,13 +335,13 @@ window.onload = async function () {
         `;
 
         toastContainer.appendChild(toast);
-        overlay.style.display = "block"; // Show overlay
+        overlay.style.display = "block"; 
 
         // Close modal on button click
         toast.querySelector(".close-toast").addEventListener("click", function () {
             toast.classList.remove("show");
-            overlay.style.display = "none"; // Hide overlay
-            setTimeout(() => toast.remove(), 500); // Remove after animation
+            overlay.style.display = "none"; 
+            setTimeout(() => toast.remove(), 500); 
         });
 
         // Close modal when clicking outside
@@ -346,7 +351,6 @@ window.onload = async function () {
             setTimeout(() => toast.remove(), 500);
         });
 
-        // Fetch data from API and populate the table
         fetch(`/api/monthly_report?client=${clientName}&start_date=${startDate}&end_date=${endDate}`)
             .then(response => response.json())
             .then(data => {
