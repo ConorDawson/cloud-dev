@@ -4,13 +4,13 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Current Graphs</title>
-  <link rel="stylesheet" href="/current.css">
+  <link rel="stylesheet" href="/style/style.css">
 
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
   <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script> <!-- Axios -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script> <!-- Chart.js -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.16.9/xlsx.full.min.js"></script> <!-- XLSX -->
-  <script src="/current_graph.js" defer></script> 
+  <script src="/current_graphs/current_graph.js" defer></script> 
 </head>
 <body class="container">
 
@@ -35,6 +35,9 @@
     </form>
     <form action="/logout" method="POST">
       <button type="submit" class="button">Employee Reports</button>
+    </form>
+    <form action="/admin" method="POST">
+      <button type="submit" class="button">Admininistration</button>
     </form>
   </div>
 

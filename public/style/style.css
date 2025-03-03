@@ -5,7 +5,7 @@ body {
     conic-gradient(at 50% 25%, #0000 75%, #004d66 0) 60px 60px, /* Matching teal color */
     conic-gradient(at 50% 25%, #0000 75%, #004d66 0) calc(2 * 60px) calc(2 * 60px),
     conic-gradient(at 50% 25%, #0000 75%, #004d66 0) calc(3 * 60px) calc(3 * 60px),
-    repeating-linear-gradient(135deg, #9ea9b7 0 12.5%, #6a7586 0 25%); /* A mix of muted greys and blues */
+    repeating-linear-gradient(135deg, #b7ad9e 0 12.5%, #6a7586 0 25%); /* A mix of muted greys and blues */
   background-size: calc(4 * 60px) calc(4 * 60px);
 }
 
@@ -345,4 +345,106 @@ h1 {
 
 .gen-button:hover {
   background-color: #218838;
+}
+
+.employees_card {
+  background: #ffffff;
+  padding: 20px;
+  width: 400px;
+  margin: 50px auto;
+  margin-top: 100px;
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  text-align: center;
+}
+
+.employees_card h1 {
+  font-size: 24px;
+  color: #333;
+  margin-bottom: 15px;
+}
+
+.employees_card label {
+  display: block;
+  font-size: 16px;
+  font-weight: bold;
+  margin-top: 10px;
+  text-align: left;
+  color: #444;
+}
+
+.employees_card input {
+  width: 100%;
+  padding: 10px;
+  margin-top: 5px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  font-size: 16px;
+}
+
+.gen-button {
+  margin-top: 20px;
+  width: 100%;
+  padding: 12px;
+  font-size: 18px;
+  font-weight: bold;
+  color: white;
+  background: #007bff;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
+
+.gen-button:hover {
+  background: #0056b3;
+}
+
+.gen-button i {
+  margin-right: 8px;
+}
+
+@media (max-width: 500px) {
+  .employees_card {
+      width: 90%;
+      padding: 15px;
+  }
+  
+  .employees_card h1 {
+      font-size: 20px;
+  }
+
+  .gen-button {
+      font-size: 16px;
+      padding: 10px;
+  }
+
+  .employees_card input {
+      font-size: 14px;
+  }
+
+ 
+/* Button styling */
+.button {
+  background-color: #28a745;
+  color: white;
+  border: none;
+  padding: 8px 12px;
+  cursor: pointer;
+  border-radius: 5px;
+  font-size: 14px;
+}
+
+.button:hover {
+  background-color: #218838;
+}
+
+/* Delete button with red color */
+form[action="/delete_employee"] .button {
+  background-color: #dc3545;
+}
+
+form[action="/delete_employee"] .button:hover {
+  background-color: #c82333;
+}
 }

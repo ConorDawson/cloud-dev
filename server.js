@@ -69,16 +69,16 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, 'public')));
 
+
 app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, 'views/login.html'));
 });
 
-// Handle Login
 app.post('/login', async (req, res) => {
   const { email, password } = req.body;
 
   if (!email || !password) {
-    return res.status(400).send('Email and password are required.');
+    return res.status(400).json({ error: "Email and password are required." });
   }
 
   try {
@@ -97,15 +97,21 @@ app.post('/login', async (req, res) => {
         employee_surname,
       };
 
-      res.redirect(`/home?employee_id=${encodeURIComponent(employee_id)}&employee_forename=${encodeURIComponent(employee_forename)}&employee_surname=${encodeURIComponent(employee_surname)}`);
+      res.json({
+        message: "Login successful",
+        employee_id,
+        forename: employee_forename,
+        surname: employee_surname,
+      });
     } else {
-      res.status(401).send('Invalid email or password.');
+      res.status(401).json({ error: "Invalid email or password." });
     }
   } catch (err) {
-    console.error('Error during login:', err);
-    res.status(500).send('Internal server error.');
+    console.error("Error during login:", err);
+    res.status(500).json({ error: "Internal server error." });
   }
 });
+
 
 // Handle Logout (clear session)
 app.post('/logout', (req, res) => {
@@ -166,8 +172,19 @@ app.post('/predicted', (req, res) => {
   res.sendFile(path.join(__dirname, 'views/predicted_graphs.html'));
 });
 
+app.post('/admin', (req, res) => {
+  if (!req.session.user) {
+    return res.redirect('/');
+  }
+  res.sendFile(path.join(__dirname, 'public/admin/main_form/admin.html'));
+});
 
 
+
+// Serve employee management pages
+app.post('/add_employee', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public/admin/employee_functions/add_employee/add_employee.html'));
+});
 
 // API Endpoints
 app.get('/api/clients', async (req, res) => {
@@ -196,52 +213,119 @@ app.post('/api/timesheet-hours', async (req, res) => {
 
 
 app.post('/submitTimesheet', async (req, res) => {
-  const timesheetData = req.body;
-
-  if (!Array.isArray(timesheetData) || timesheetData.length === 0) {
-    return res.status(400).send('Invalid timesheet data.');
-  }
-
-  const query = `
-    INSERT INTO timesheet_hours2 (company_name, hours, work_date, employee_id) 
-    VALUES ($1, $2, $3, $4)
-    ON CONFLICT (company_name, work_date, employee_id)
-    DO UPDATE SET hours = EXCLUDED.hours
-    RETURNING company_name, hours, work_date, employee_id;
-  `;
-
-  const client = await pool.connect();
   try {
-    console.log("Beginning transaction...");
-    await client.query('BEGIN');
+      const response = await fetch('http://localhost:5001/submitTimesheet', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(req.body),
+      });
 
-    for (const entry of timesheetData) {
-      const { clientName, hours, date, employee_id } = entry;
-      const formattedHours = parseFloat(hours) || 0;
-      const formatID = parseInt(employee_id) || 0;
+      const data = await response.json();
 
-      console.log(`Processing entry: ${clientName}, ${formattedHours}, ${date}, ${formatID}`);
-
-      try {
-        const result = await client.query(query, [clientName, formattedHours, date, formatID]);
-        console.log('Query result:', result.rows);
-      } catch (err) {
-        console.error('Query failed for entry:', clientName, date, formattedHours, formatID, err);
-        await client.query('ROLLBACK');
-        return res.status(500).send('Error processing timesheet data.');
+      if (response.ok) {
+          res.status(200).json(data);
+      } else {
+          res.status(response.status).json(data);
       }
-    }
-
-    await client.query('COMMIT');
-    res.status(200).send('Timesheet submitted successfully');
-  } catch (err) {
-    console.error('Transaction failed:', err);
-    await client.query('ROLLBACK');
-    res.status(500).send('Internal server error');
-  } finally {
-    client.release();
+  } catch (error) {
+      console.error('Error calling Flask server:', error);
+      res.status(500).send('Internal Server Error');
   }
 });
+
+
+app.post('/add_new_employee', async (req, res) => {
+  try {
+    const { employee_forename, employee_surname, employee_email, employee_password, employee_wage, role } = req.body;
+    const response = await axios.post('http://localhost:5001/add_new_employee', {
+      employee_forename, 
+      employee_surname, 
+      employee_email, 
+      employee_password, 
+      employee_wage,
+      role
+    });
+    if (response.status === 200) {
+      res.status(200).send('Employee added successfully');
+    } else {
+      console.log('Error response from Flask:', response.data); // Log the error data for debugging
+      res.status(response.status).json({ message: response.data.message || 'Unknown error' });
+    }
+  } catch (err) {
+    console.error('Error adding new Employee:', err);
+    if (err.response) {
+      console.error('Error response from Flask:', err.response.data); // Log the error response from Flask
+      res.status(err.response.status).json({ message: err.response.data.message || 'Error from Flask' });
+    } else {
+      // If no response from Flask, it's a server error on Express side
+      res.status(500).send('Server Error');
+    }
+  }
+});
+
+app.get('/getAllEmployees', async (req, res) => {
+  try {
+    const response = await axios.get('http://localhost:5001/getAllEmployees');
+    res.json(response.data);
+  } catch (err) {
+    console.error('Error fetching employees:', err);
+    res.status(500).send('Server Error');
+  }
+}); 
+app.post('/update_employee', async (req, res) => {
+  console.log('reached server.js');
+  try {
+    const { email, employee_forename, employee_surname, employee_wage, role, employee_id } = req.body;
+    const response = await axios.post('http://localhost:5001/update_employee', {
+      email, 
+      employee_forename, 
+      employee_surname, 
+      employee_wage,
+      role,
+      employee_id,
+    });
+    if (response.status === 200) {
+      res.status(200).send('Employee updated successfully');
+    } else {
+      console.log('Error response from Flask:', response.data); // Log the error data for debugging
+      res.status(response.status).json({ message: response.data.message || 'Unknown error' });
+    }
+  } catch (err) {
+    console.error('Error adding new Employee:', err);
+    if (err.response) {
+      console.error('Error response from Flask:', err.response.data); // Log the error response from Flask
+      res.status(err.response.status).json({ message: err.response.data.message || 'Error from Flask' });
+    } else {
+      // If no response from Flask, it's a server error on Express side
+      res.status(500).send('Server Error');
+    }
+  }
+});
+
+app.post('/delete_employee', async (req, res) => {
+  console.log('reached /delete_employee');
+  const { employee_id } = req.body;
+  console.log('employee_id:', employee_id);
+  try{
+    const response = await axios.post('http://localhost:5001/delete_employee', {
+      employee_id
+    });
+
+    if (response.status === 200) {
+      res.status(200).send('Employee deleted successfully');
+    } else {
+      console.log('Error response from Flask:', response.data); // Log the error data for debugging
+      res.status(response.status).json({ message: response.data.message || 'Unknown error' });
+    }
+
+  }
+  catch (err) {
+    console.error('Error deleting employee:', err);
+    res.status(500).send('Server Error');
+  }
+});
+
+
 
 // Start server
 app.listen(PORT, () => {

@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Panel</title>
+  <link rel="stylesheet" href="/style/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.16.9/xlsx.full.min.js"></script>
+  <script src="/admin/main_form/admin.js" defer></script> 
+</head>
+<body class="container">
+
+  <div class="navbar">
+    <form action="/logout" method="POST"><button type="submit" class="button">Logout</button></form>
+    <form action="/current" method="POST"><button type="submit" class="button">Current Reports</button></form>
+    <form action="/home" method="POST"><button type="submit" class="button">My Timesheet</button></form>
+    <form action="/my_report" method="POST"><button type="submit" class="button">My Work Breakdown</button></form>
+    <form action="/predicted" method="POST"><button type="submit" class="button">Predictive Reports</button></form>
+    <form action="/employee_reports" method="POST"><button type="submit" class="button">Employee Reports</button></form>
+    <form action="/admin" method="POST"><button type="submit" class="button">Administration</button></form>
+  </div>
+
+  <h1>ADMIN PANEL</h1>
+
+  <div class="reports_card">
+    <h1 reportHeading >Manage Employees</h1>
+    <form action="/add_employee" method="POST"><button type="submit" class="button">Add Employee</button></form>   
+    <h3 reportHeading>Current Employees</h3>
+    <table id="reportTable">
+     
+   </table>
+
+    <h1 reportHeading>Manage Clients</h1>
+    <button id="add-employee">Add Client</button>
+    <button id="update-employee">Update Client</button>
+    <button id="delete-employee">Delete Client</button>
+  </div>
+  <div id="t" class="toast">
+    <div class="toast-content">
+        <h2 id="modalTitle">Update Employee</h2>
+        <form id="updateEmployeeForm">
+            <table>
+                <tr>
+                    <td><label for="employeeForename">Forename:</label></td>
+                    <td><input type="text" id="employeeForename" name="employeeForename" required></td>
+                </tr>
+                <tr>
+                    <td><label for="employeeSurname">Surname:</label></td>
+                    <td><input type="text" id="employeeSurname" name="employeeSurname" required></td>
+                </tr>
+                <tr>
+                    <td><label for="employeeEmail">Email:</label></td>
+                    <td><input type="email" id="employeeEmail" name="employeeEmail" required></td>
+                </tr>
+                <tr>
+                    <td><label for="employeeRole">Employee Role:</label></td>
+                    <td>
+                        <select id="employeeRole" name="employeeRole">
+                            <option value="Ad">Admin</option>
+                            <option value="Dev">Developer</option>
+                            <option value="Des">Designer</option>
+                            <option value="HR">HR</option>
+                            <option value="QA">QA</option>
+                            <option value="Mkt">Marketing</option>
+                            <option value="Fin">Finance</option>
+                        </select>
+                    </td>
+                </tr>
+                <tr>
+                    <td><label for="employeeWage">Wage:</label></td>
+                    <td><input type="text" id="employeeWage" name="employeeWage" required></td>
+                </tr>
+            </table>
+
+            <input type="hidden" id="employeeId" name="employeeId">
+            
+            <div style="text-align: center; margin-top: 10px;">
+                <button type="button" id ="saveUserChanges">Save Changes</button>
+                <button type="button" id="closeToast" class="button">Cancel</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+
+</body>
+</html>

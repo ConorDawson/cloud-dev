@@ -54,7 +54,6 @@ def fetch_client_data(start_date, end_date):
             cursor.execute(query, (start_date, end_date))  # Safe parameterized query
             return cursor.fetchall()
 
-
 def process_client_data(rows):
     """
     Processes the fetched data to calculate total hours and total cost for each client.
@@ -62,6 +61,12 @@ def process_client_data(rows):
     client_data = {}
     for row in rows:
         company_name, hours, employee_wage, client_payment, work_date, billing_schedule = row
+        
+        # Check for None values and assign default values if necessary
+        hours = hours if hours is not None else 0
+        employee_wage = employee_wage if employee_wage is not None else 0
+        client_payment = client_payment if client_payment is not None else 0
+        
         if company_name not in client_data:
             client_data[company_name] = {
                 'total_hours': 0,
@@ -70,13 +75,12 @@ def process_client_data(rows):
                 'billing_schedule': billing_schedule
             }
 
-           
-
         # Accumulate the hours and cost for each client
         client_data[company_name]['total_hours'] += hours
         client_data[company_name]['total_cost'] += hours * employee_wage
     
     return client_data
+
 
 
 
@@ -93,7 +97,7 @@ def calculate_profit_loss(client_data, start_date, end_date):
 
     for company_name, info in client_data.items():
         total_cost = info['total_cost']
-        client_payment = info['client_payment']
+        client_payment = info['client_payment'] if info['client_payment'] is not None else 0
         billing_schedule = info['billing_schedule']
         total_payment = 0
 
@@ -109,9 +113,7 @@ def calculate_profit_loss(client_data, start_date, end_date):
         else:
             billing_cycles = 0  # Default if an unknown schedule appears
 
-        
         billing_cycles = max(1, billing_cycles)
-
         total_payment = client_payment * billing_cycles
 
         if total_cost == 0:
@@ -119,11 +121,11 @@ def calculate_profit_loss(client_data, start_date, end_date):
         else:
             profit_loss_percentage = ((total_payment - total_cost) / total_cost) * 100
 
-      
         info['profit_loss_percentage'] = profit_loss_percentage
         info['client_payment'] = total_payment
 
     return client_data
+
 
 
 

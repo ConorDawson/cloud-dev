@@ -4,24 +4,27 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Login</title>
-  <link rel="stylesheet" href="/login.css">
+  <link rel="stylesheet" href="/style/style.css">
+  <script src="/login/login.js" defer></script>
 </head>
 <body class="container">
   <div class="login-box">
     <p>Quacktastic Statistics</p>
-    <form action="/login" method="POST">
+    <form id="loginForm">
       <div class="user-box">
-        <input required name="email" type="email">
+        <input required id="email" type="email">
         <label>Email</label>
       </div>
       <div class="user-box">
-        <input required name="password" type="password">
+        <input required id="password" type="password">
         <label>Password</label>
       </div>
       <button type="submit" class="button">
         Login
       </button>
+      <p id="error-message" style="color: red; display: none;">Invalid email or password.</p>
     </form>
   </div>
+  
 </body>
 </html>

@@ -2,6 +2,11 @@ import psycopg2
 from flask import Flask, jsonify, request
 from python.current_reports.current_reports import fetch_client_data, process_client_data, calculate_profit_loss, prepare_final_data
 from python.current_reports.monthly_details import fetch_monthly_report
+from python.timesheet.timesheet import submit_timesheet
+from python.employee.add_employee import add_new_employee
+from python.employee.get_employees import getEmployees
+from python.employee.update_employee import update_employee
+from python.employee.delete_employee import delete_employee
 
 
 app = Flask(__name__)
@@ -52,8 +57,45 @@ def get_monthly_report():
         return jsonify({'error': 'Error fetching data'}), 500
 
 
+@app.route('/submitTimesheet', methods=['POST'])
+def submit_timesheet_route():
+    return submit_timesheet()  # Call function from timesheet.py
 
 
+@app.route('/add_new_employee', methods=['POST'])
+def insert_employee():
+     return add_new_employee()
 
+
+@app.route('/getAllEmployees', methods=['GET'])
+def get_all_employees():
+    response_data =getEmployees()
+    return response_data
+
+@app.route('/update_employee', methods=['POST'])
+def save_update_employee():
+    print("reached app.py")
+    data = request.get_json()  # Get the JSON data sent from the client
+    print("Received data:", data)
+    
+    try:
+        update_employee(data)
+        return jsonify({"message": "Employee updated successfully"}), 200
+    except Exception as e:
+        print(f"Error updating employee: {e}")
+        return jsonify({"message": "Error updating employee"}), 500
+    
+@app.route('/delete_employee', methods=['POST'])
+def call_delete_employee():
+    data = request.get_json()
+    print("Received data:", data)
+    
+    try:
+        delete_employee(data)
+        return jsonify({"message": "Employee deleted successfully"}), 200
+    except Exception as e:
+        print(f"Error deleting employee: {e}")
+        return jsonify({"message": "Error deleting employee"}), 500
+    
 if __name__ == '__main__':
     app.run(port=5001)

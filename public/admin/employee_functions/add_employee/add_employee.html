@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Add Employee</title>
+  <link rel="stylesheet" href="/style/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.16.9/xlsx.full.min.js"></script>
+  <script src="/admin/employee_functions/add_employee/add_employee.js" defer></script> 
+</head>
+<body class="container">
+
+  <div class="navbar">
+    <form action="/logout" method="POST"><button type="submit" class="button">Logout</button></form>
+    <form action="/current" method="POST"><button type="submit" class="button">Current Reports</button></form>
+    <form action="/home" method="POST"><button type="submit" class="button">My Timesheet</button></form>
+    <form action="/my_report" method="POST"><button type="submit" class="button">My Work Breakdown</button></form>
+    <form action="/predicted" method="POST"><button type="submit" class="button">Predictive Reports</button></form>
+    <form action="/employee_reports" method="POST"><button type="submit" class="button">Employee Reports</button></form>
+    <form action="/admin" method="POST"><button type="submit" class="button">Administration</button></form>
+  </div>
+
+  <div class="employees_card">
+    <h1 id="reportHeading">Add Employee</h1>
+    <form id="addEmployee" method="POST"> <!-- Remove action here -->
+      <label for="forname">Employee Forname:</label>
+      <input type="text" id="forname" name="forname" >
+      
+      <label for="surname">Employee Surname:</label>
+      <input type="text" id="surname" name="surname" >
+      
+      <label for="employeeEmail">Employee Email:</label>
+      <input type="email" id="employeeEmail" name="employeeEmail" >
+    
+      <label for="employeePassword">Employee Password:</label>
+      <input type="password" id="employeePassword" name="employeePassword" >
+    
+      <label for="employeeWage">Employee Wage:</label>
+      <input type="text" id="employeeWage" name="employeeWage" >
+    
+      <label for="employeeRole">Employee Role:</label>
+      <select id="employeeRole" name="employeeRole">
+        <option value="Ad">Admin</option>
+        <option value="Dev">Developer</option>
+        <option value="Des">Designer</option>
+        <option value="HR">HR</option>
+        <option value="QA">QA</option>
+        <option value="Mkt">Marketing</option>
+        <option value="Fin">Finance</option>
+      </select>
+    
+      <button type="submit" class="gen-button" id="addEmployeeSubmit"> <i class="fa-solid fa-table-list"></i> Add Employee</button>
+    </form>
+      
+  </div>
+  
+
+</body>
+</html>
