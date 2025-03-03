@@ -272,6 +272,7 @@ app.get('/getAllEmployees', async (req, res) => {
     res.status(500).send('Server Error');
   }
 }); 
+
 app.post('/update_employee', async (req, res) => {
   console.log('reached server.js');
   try {
@@ -326,7 +327,50 @@ app.post('/delete_employee', async (req, res) => {
 });
 
 
+app.post('/getEmployeeWorkYears', async (req, res) => {
+  const { employee_id } = req.body;
+  try {
+      const response = await axios.post('http://localhost:5001/getEmployeeWorkYears', {
+          employee_id
+      });
+      res.json(response.data);
+  } catch (err) {
+      console.error('Error fetching employees:', err);
+      res.status(500).send('Server Error');
+  }
+});
 
+
+app.post('/getEmployeeYearlyWork', async (req, res) => {
+  const { employee_id, year } = req.body;
+  try {
+      const response = await axios.post('http://localhost:5001/getEmployeeYearlyWork', {
+          employee_id,
+          year
+      });
+      res.json(response.data);
+  } catch (err) {
+      console.error('Error fetching employees:', err);
+      res.status(500).send('Server Error');
+  }
+}
+);
+
+app.post('/getMonthlyIndividualClients', async (req, res) => {
+  const { employee_id, year, company_name } = req.body;
+  try {
+      const response = await axios.post('http://localhost:5001/getMonthlyIndividualClients', {
+          employee_id,
+          year,
+          company_name
+      });
+      res.json(response.data);
+  } catch (err) {
+      console.error('Error fetching employees:', err);
+      res.status(500).send('Server Error');
+  }
+}
+);
 // Start server
 app.listen(PORT, () => {
   console.log(`Server running on http://localhost:${PORT}`);

@@ -7,6 +7,7 @@ from python.employee.add_employee import add_new_employee
 from python.employee.get_employees import getEmployees
 from python.employee.update_employee import update_employee
 from python.employee.delete_employee import delete_employee
+from python.individual_report.individual_report import getEmployeeWorkYears, get_client_hours_for_employee, get_individual_monthly_report
 
 
 app = Flask(__name__)
@@ -97,5 +98,43 @@ def call_delete_employee():
         print(f"Error deleting employee: {e}")
         return jsonify({"message": "Error deleting employee"}), 500
     
+
+@app.route('/getEmployeeWorkYears',methods=['POST'])
+def get_years_for_employee():
+    data = request.get_json()
+    print("Recieved data:",data)
+    try:
+        response_data = getEmployeeWorkYears(data)
+        return response_data
+    except Exception as e:
+        print(f"Error fetching data: {e}")
+        return jsonify({'error': 'Error fetching data'}), 500
+    
+
+@app.route('/getEmployeeYearlyWork', methods=['POST'])
+def get_hours_for_client():
+    data = request.get_json()
+    print("Received data:", data)
+
+    try:
+        response_data = get_client_hours_for_employee(data)  # Call function correctly
+        return jsonify(response_data)  # Ensure correct response format
+    except Exception as e:
+        print(f"Error fetching data: {e}")
+        return jsonify({'error': 'Error fetching data'}), 500
+
+@app.route('/getMonthlyIndividualClients', methods=['POST'])
+def get_individual_report_monthly_details():
+    data = request.get_json()
+    print("Received data:", data)
+
+    try:
+        response_data = get_individual_monthly_report(data)  # Call function correctly
+        return jsonify(response_data)  # Ensure correct response format
+    except Exception as e:
+        print(f"Error fetching data: {e}")
+        return jsonify({'error': 'Error fetching data'}), 500
+
+        
 if __name__ == '__main__':
     app.run(port=5001)

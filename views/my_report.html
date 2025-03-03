@@ -4,13 +4,13 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Current Graphs</title>
-  <link rel="stylesheet" href="/current.css">
+  <link rel="stylesheet" href="/style/style.css">
 
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
   <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script> <!-- Axios -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script> <!-- Chart.js -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.16.9/xlsx.full.min.js"></script> <!-- XLSX -->
-  <script src="/current_graph.js" defer></script> 
+  <script src="/individual_reports/individual_report.js" defer></script> 
 </head>
 <body class="container">
     <div class="navbar">
@@ -38,49 +38,39 @@
       </div>
 
   <div class="reports_card">
-  <h1 id="reportHeading">My Work Breakdown</h1>
-    <label for="startDate">Start Date:</label>
-   <input type="date" id="startDate" class="date">
-   <label for="endDate">End Date:</label>
-   <input type="date" id="endDate" class="date">
-    <button class="gen-button" id="generateReport"> <i class="fa-solid fa-table-list"></i> Generate Report</button>
+  <h1 id="reportHeading"></h1>
+  <label for="reportDate">Select Year:</label>
 
-    <label for="sortDropdown">Sort By:</label>
-    <select id="sortDropdown">
-      <option value="Client">Client</option>
-      <option value="Total Hours Worked">Total Hours Worked</option>
-      <option value="Cost">Cost</option>
-      <option value="Client Payment">Client Payment</option>
-      <option value="Profit/Loss">Profit/Loss</option>
-    </select>
+  <select id="select_year">
+  </select>
+  <label for="sortDropdown">Sort By:</label>
+  <select id="sortDropdown">
+    <option value="Client">Client</option>
+    <option value="Total Hours Worked">Total Hours Worked</option>
+  </select>
+  
+    <button class="gen-button" id="generateReport"> <i class="fa-solid fa-table-list"></i> Generate Report</button>
     
-    <div class="charts-container">
-      <span class ="paymentsChartDiv">
-    <h1 class ="paymentsChartHeader"></h1>
-    <canvas id="paymentsChart"></canvas>
+    <div clas="individualCharts">
+    <span class ="monthlyBreakdownChartDiv">
+    <h1 class ="monthlyBreakdownChartHeader"></h1>
+    <canvas id="monthlyBreakdownChart"></canvas>
     </span>
-    <span class ="profitLossChartDiv">
-    <h1 class ="profitLossChartHeader"></h1>
-    <canvas id="profitLossChart"></canvas>
-    </span>
-    <span class ="costChartDiv">
-    <h1 class ="costChartHeader"></h1>
-    <canvas id="costChart"></canvas>
+    <span class ="clientBreakdownChartDiv">
+    <h1 class ="clientBreakdownChartHeader"></h1>
+    <canvas id="clientBreakdownChart"></canvas>
     </span>
 </div>
   
-    <table id="reportTable">
+    <table id="individualReportTable">
       <thead>
           <tr>
               <th>Client</th>
               <th>Total Hours Worked</th>
-              <th>Cost</th>
-              <th>Client Payment</th>
-              <th>Profit/Loss %</th>
               <th>Detail Breakdown</th>
           </tr>
       </thead>
-      <tbody id="reportTableBody">
+      <tbody id="individualReportTableBody">
           <!-- Table rows will be dynamically added here -->
           
       </tbody>
@@ -93,7 +83,19 @@
 <div id="t" class="toast">
   <div class="toast-content">
       <h2 id="modalTitle"></h2>
-      <div id="modalBody"></div>
+      <div id="modalBody">
+        <table id="modalTable">
+          <thead>
+              <tr>
+                  <th>Month</th>
+                  <th>Hours Worked</th>
+              </tr>
+          </thead>
+          <tbody id="modalTableBody">
+          </tbody>
+          <button id="closeModal">Close</button>
+
+      </div>
   </div>
 </div>
 </body>
