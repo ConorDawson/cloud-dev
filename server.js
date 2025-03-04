@@ -371,6 +371,66 @@ app.post('/getMonthlyIndividualClients', async (req, res) => {
   }
 }
 );
+
+app.post('/getFullMonthlyWorkEmployee', async (req, res) => {
+  const { employee_id, year } = req.body;
+  try {
+      const response = await axios.post('http://localhost:5001/getFullMonthlyWorkEmployee', {
+          employee_id,
+          year
+      });
+      res.json(response.data);
+  } catch (err) {
+      console.error('Error fetching employees:', err);
+      res.status(500).send('Server Error');
+  }
+}
+);
+
+
+app.get('/getAllClients', async (req, res) => {
+
+  try{
+    const response = await axios.get('http://localhost:5001/getAllClients', {
+    });
+res.json(response.data);
+  }
+  catch(err){
+    console.error('Error Fetching Clients: ', err);
+    res.status(500).send('Server Error');
+  }
+
+  }
+);
+
+
+app.post('/delete_client', async (req, res) => {
+  console.log('reached /delete_client');
+  const { client_id } = req.body;
+  console.log('client_id:', client_id);
+  try{
+    const response = await axios.post('http://localhost:5001/delete_client', {
+      client_id
+    });
+
+    if (response.status === 200) {
+      res.status(200).send('CLient deleted successfully');
+    } else {
+      console.log('Error response from Flask:', response.data); // Log the error data for debugging
+      res.status(response.status).json({ message: response.data.message || 'Unknown error' });
+    }
+
+  }
+  catch (err) {
+    console.error('Error deleting client:', err);
+    res.status(500).send('Server Error');
+  }
+});
+
+
+
+
+
 // Start server
 app.listen(PORT, () => {
   console.log(`Server running on http://localhost:${PORT}`);

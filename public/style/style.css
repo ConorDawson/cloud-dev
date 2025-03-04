@@ -277,7 +277,7 @@ Table td:hover {
   margin-top: 20px;
 }
 
-.paymentsChartDiv, .profitLossChartDiv, .costChartDiv {
+.paymentsChartDiv, .profitLossChartDiv, .costChartDiv #monthlyBreakdownChart, #clietnWorkBrakdown {
   display: flex;
   flex-wrap: wrap;
   flex-direction: column;

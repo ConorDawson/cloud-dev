@@ -27,13 +27,14 @@ window.onload = async function () {
     const Year = document.getElementById("select_year").value;
     const initalReportData = await getEmployeeYearlyWork(Year);       
     generateReportTable(initalReportData.client_hours);
+    getFullMonthlyWork(Year);
 
 
+   
 
     document.getElementById("reportHeading").innerHTML = forename + " " + surname + " - My Work Breakdown " + Year;
 // Event listener for generating the report
 document.getElementById("generateReport").addEventListener("click", async function () {
-    // Clear the report heading and set the new heading
     document.getElementById("reportHeading").innerHTML = "";
     const selectedYear = document.getElementById("select_year").value;
     const employee_id = sessionStorage.getItem("employee_id");
@@ -44,10 +45,7 @@ document.getElementById("generateReport").addEventListener("click", async functi
         alert("Please select a year before generating the report.");
         return;
     }
-
     console.log(`Generating report for Employee ID: ${employee_id}, Year: ${selectedYear}`);
-
-    // Fetch report data
     const reportData = await getEmployeeYearlyWork(selectedYear);
 
     if (reportData && reportData.client_hours) {
@@ -58,6 +56,8 @@ document.getElementById("generateReport").addEventListener("click", async functi
         console.error("Failed to generate report.");
         alert("Error generating report. Please try again.");
     }
+
+    getFullMonthlyWork(selectedYear);
 });
    
     
@@ -223,9 +223,6 @@ window.addEventListener("click", function(event) {
 });
 
 
-
-
-
 function getMonthlyIndividualClients(client) {
     year = document.getElementById("select_year").value;
     employee_id = sessionStorage.getItem("employee_id");
@@ -248,6 +245,131 @@ function getMonthlyIndividualClients(client) {
     }
     );
 }
+
+function getFullMonthlyWork() {
+    const year = document.getElementById("select_year").value;
+    const employee_id = sessionStorage.getItem("employee_id");
+    console.log("Year: ", year);
+    console.log("Employee ID: ", employee_id);
+
+    axios.post('/getFullMonthlyWorkEmployee', {
+        employee_id,
+        year
+    }).then((response) => {
+        console.log('getFullMonthlyWork', response.data);
+        const monthlyChartData = response.data.monthly_chart; // Access the monthly_chart array
+        console.log('monthlyChartData', monthlyChartData);
+        createLineChart(monthlyChartData);
+
+    }).catch((error) => {
+        console.error('Error fetching monthly chart clients:', error);
+        alert('Error fetching monthly chart clients. Please try again.');
+    });
+}
+
+
+function createLineChart(monthlyChartData) {
+    // Prepare data for Chart.js
+    const labels = monthlyChartData.map(item => item.month);
+    const totalHours = monthlyChartData.map(item => parseFloat(item.total_hours));
+
+    // Create a new canvas element
+    document.getElementById("monthlyBreakdownChart").innerHTML = "<canvas id='monthlyChart'></canvas>";
+    year = document.getElementById("select_year").value;
+
+    document.getElementById("monthlyBreakdownH1").textContent = "Monthly Work Breakdow for  " + year;
+
+    // Get the context of the canvas element we just created
+    const ctx = document.getElementById('monthlyChart').getContext('2d');
+
+    // Create the line chart
+    new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: labels,
+            datasets: [{
+                label: 'Total Hours',
+                data: totalHours,
+                borderColor: 'rgba(75, 192, 192, 1)',
+                backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                borderWidth: 2,
+                fill: true,
+            }]
+        },
+        options: {
+            responsive: true,
+            scales: {
+                y: {
+                    beginAtZero: true
+                }
+            }
+        }
+    });
+
+    createPieChart();
+}
+
+async function createPieChart() {
+    const year = document.getElementById("select_year").value;
+    const employee_id = sessionStorage.getItem("employee_id");
+    
+    try {
+        const response = await axios.post('/getEmployeeYearlyWork', {
+            employee_id,
+            year
+        });
+        console.log(response.data);
+        const chartData = response.data.client_hours; // Access the client_hours array
+
+        // Extract client names and hours from the response data
+        const clientNames = chartData.map(item => item[0]);
+        const totalHours = chartData.map(item => parseFloat(item[1]));
+
+        // Create a new canvas element
+        document.getElementById("clietnWorkBreakdown").innerHTML = "<canvas id='clientPieChart'></canvas>";
+
+        // Get the context of the canvas element we just created
+        const ctx = document.getElementById('clientPieChart').getContext('2d');
+
+        // Create the pie chart
+        new Chart(ctx, {
+            type: 'pie',
+            data: {
+                labels: clientNames,
+                datasets: [{
+                    label: 'Client Work Hours',
+                    data: totalHours,
+                    backgroundColor: [
+                        'rgba(255, 99, 132, 0.2)',
+                        'rgba(54, 162, 235, 0.2)',
+                        'rgba(255, 206, 86, 0.2)',
+                        'rgba(75, 192, 192, 0.2)',
+                        'rgba(153, 102, 255, 0.2)',
+                    ],
+                    borderColor: [
+                        'rgba(255, 99, 132, 1)',
+                        'rgba(54, 162, 235, 1)',
+                        'rgba(255, 206, 86, 1)',
+                        'rgba(75, 192, 192, 1)',
+                        'rgba(153, 102, 255, 1)',
+                    ],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true
+            }
+        });
+
+    } catch (err) {
+        console.error('Error fetching employee yearly work:', err);
+        alert('Error fetching employee yearly work. Please try again.');
+    }
+}
+
+
+
+
 
 
 

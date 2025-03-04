@@ -121,3 +121,47 @@ def get_individual_monthly_report(data):
             conn.close()
 
 
+def get_monthly_chart(data):
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor()
+        employee_id = data.get('employee_id')
+        year = data.get('year')
+        print("Reached get_monthly_chart")
+
+        cursor.execute("""
+            SELECT
+                EXTRACT(MONTH FROM th.work_date) AS month,
+                SUM(th.hours) AS total_hours
+            FROM timesheet_hours2 th
+            WHERE th.employee_id = %s AND EXTRACT(YEAR FROM th.work_date) = %s
+            GROUP BY EXTRACT(MONTH FROM th.work_date)
+            ORDER BY month;
+        """, (employee_id, year))
+
+        monthly_data = cursor.fetchall()
+        print(monthly_data)
+
+        # List of month names
+        month_names = [
+            "January", "February", "March", "April", "May", "June",
+            "July", "August", "September", "October", "November", "December"
+        ]
+        
+        # Prepare a dictionary to map month names to their respective hours
+        chart_data = []
+        for month, total_hours in monthly_data:
+            month_name = month_names[int(month) - 1]  # Convert month number to month name
+            chart_data.append({ 'month': month_name, 'total_hours': total_hours })
+
+        if chart_data:
+            return {'monthly_chart': chart_data}  # Return the structured chart data
+        else:
+            return {'error': 'No monthly chart data found for employee'}
+        
+    except Exception as e:
+        print("Error fetching data:", e)
+        return {'error': 'Internal Server Error'}  # Return a dictionary
+
+
+

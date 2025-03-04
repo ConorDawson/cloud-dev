@@ -7,8 +7,9 @@ from python.employee.add_employee import add_new_employee
 from python.employee.get_employees import getEmployees
 from python.employee.update_employee import update_employee
 from python.employee.delete_employee import delete_employee
-from python.individual_report.individual_report import getEmployeeWorkYears, get_client_hours_for_employee, get_individual_monthly_report
-
+from python.individual_report.individual_report import getEmployeeWorkYears, get_client_hours_for_employee, get_individual_monthly_report, get_monthly_chart
+from python.clients.get_client import getClients
+from python.clients.delete_clients import delete_client
 
 app = Flask(__name__)
 
@@ -134,6 +135,38 @@ def get_individual_report_monthly_details():
     except Exception as e:
         print(f"Error fetching data: {e}")
         return jsonify({'error': 'Error fetching data'}), 500
+
+
+@app.route('/getFullMonthlyWorkEmployee', methods=['POST'])
+def monthly_individual_chart():
+    data = request.get_json()
+    print("Received data:", data)
+
+    try:
+        response_data = get_monthly_chart(data)  # Call function correctly
+        return jsonify(response_data)  # Ensure correct response format
+    except Exception as e:
+        print(f"Error fetching data: {e}")
+        return jsonify({'error': 'Error fetching data'}), 500
+
+
+@app.route('/getAllClients', methods=['GET'])
+def get_all_clientss():
+    response_data =getClients()
+    return response_data
+
+
+@app.route('/delete_client', methods=['POST'])
+def call_delete_client():
+    data = request.get_json()
+    print("Received data:", data)
+    
+    try:
+        delete_client(data)
+        return jsonify({"message": "Client deleted successfully"}), 200
+    except Exception as e:
+        print(f"Error deleting employee: {e}")
+        return jsonify({"message": "Error deleting client"}), 500
 
         
 if __name__ == '__main__':

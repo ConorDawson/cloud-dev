@@ -2,6 +2,7 @@
 document.addEventListener('DOMContentLoaded', function () {
     console.log('admin.js loaded'); //works
     fetchEmployees();//works
+    fetchClients();
     document.getElementById('saveUserChanges').addEventListener('click', updateUser); //eventListener is working
 
 
@@ -147,8 +148,106 @@ async function deleteEmployee(event) {
     }
 }
 
+// Close toast on cancel
+document.getElementById('closeToast').addEventListener('click', () => {
+    document.getElementById('t').style.display = 'none';
+});
+
+
+
+async function fetchClients() {
+    console.log('Fetching clients...');
+    try {
+        const response = await fetch('/getAllClients');
+        if (!response.ok) {
+            throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+
+        const clients = await response.json();
+        console.log('Clients:', clients);
+        populateClientTable(clients);
+    } catch (error) {
+        console.error('Error loading clients:', error);
+    }
+}
+
+
+function populateClientTable(clients) {
+    const table = document.getElementById('clientTable');
+    table.innerHTML = `
+        <tr>
+            <th>Client ID</th>
+            <th>Client Name</th>
+            <th>Client Billing Schedule</th>
+            <th>Payment Amount</th>
+            <th>Actions</th>
+        </tr>
+    `;
+
+    clients.forEach(client => {
+        const row = document.createElement('tr');
+        row.innerHTML = `
+            <td>${client.client_id}</td>
+            <td>${client.company_name}</td>
+            <td>${client.client_billing_schedule}</td>
+            <td>${client.client_payment_amount}</td>
+            <td class="actions">
+                <button class="update-btn" data-id="${client.client_id}" 
+                        data-company_name="${client.company_name}" 
+                        data-billing_schedule="${client.client_billing_schedule}" 
+                        data-payment_amount="${client.client_payment_amount}" >
+                    Update
+                </button>
+                <button class="delete-client-btn" data-id="${client.client_id}">Delete</button>
+            </td>
+        `;
+        table.appendChild(row);
+    });
+
+    // Attach event listeners to update buttons
+    document.querySelectorAll('.update-btn').forEach(button => {
+        button.addEventListener('click', openUpdateToast);
+    });
+
+    // Attach event listeners to delete buttons
+    document.querySelectorAll('.delete-client-btn').forEach(button => {
+        button.addEventListener('click', deleteClient);
+    });
+}
+
+async function deleteClient(event) {
+    const client_id = event.target.dataset.id;
+    console.log('Deleting client:', client_id);
+    
+    try {
+        const response = await fetch('/delete_client', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ client_id: client_id })
+        });
+
+        if (response.ok) {
+            alert('Client deleted successfully');
+            fetchClients();
+
+        } else {
+            throw new Error('Error deleting client');
+        }
+    } catch (error) {
+        console.error('Error deleting client:', error);
+    }
+}
+
+
+
 
 // Close toast on cancel
 document.getElementById('closeToast').addEventListener('click', () => {
     document.getElementById('t').style.display = 'none';
 });
+
+
+
+
