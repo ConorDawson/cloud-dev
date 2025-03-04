@@ -24,8 +24,6 @@ def delete_client(data):
             return jsonify({"error": "An error occurred while deleting the client"}), 500
         finally:
             conn.close()
-
-
-
+            
 if __name__ == '__main__':
     app.run(port=5001)
