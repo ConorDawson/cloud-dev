@@ -1,6 +1,7 @@
 import psycopg2
 from flask import Flask, jsonify, request
 from datetime import datetime
+import os
 
 # Database connection information
 DB_CONFIG = {

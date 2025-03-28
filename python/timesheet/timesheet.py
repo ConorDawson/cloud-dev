@@ -1,6 +1,8 @@
 import psycopg2
 from flask import Flask, jsonify, request
 from psycopg2.extras import execute_values
+import os
+
 
 # Database connection information
 DB_CONFIG = {

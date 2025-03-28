@@ -2,6 +2,7 @@ import psycopg2
 from flask import Flask, jsonify, request
 from dateutil.relativedelta import relativedelta
 from datetime import datetime
+import os
 
 # Database connection information
 DB_CONFIG = {
