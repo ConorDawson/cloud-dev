@@ -1,18 +1,24 @@
+
+require('dotenv').config();
+
 const express = require('express');
-const dotenv = require('dotenv');
-const pool = require('./db/pool');
 const path = require('path');
 const session = require('express-session');
+const { Pool } = require('pg');
+const axios = require('axios');
 
-
-
-dotenv.config();
 const app = express();
 const PORT = process.env.PORT || 5000;
 
-
-const axios = require('axios');
-
+// Database connection
+const pool = new Pool({
+  user: process.env.DB_USER,
+  host: process.env.DB_HOST,
+  database: process.env.DB_DATABASE,
+  password: process.env.DB_PASSWORD,
+  port: process.env.DB_PORT,
+  ssl: { rejectUnauthorized: false },
+});
 
 app.get('/api/client_hours', async (req, res) => {
   try {
