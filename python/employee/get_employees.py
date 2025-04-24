@@ -3,6 +3,15 @@ from flask import Flask, jsonify, request
 from datetime import datetime
 from python.database import get_db_connection
 
+# Encryption key for XOR cipher (same as used for encryption)
+ENCRYPTION_KEY = 5
+
+def xor_decrypt(cipher_text):
+    """
+    Decrypt a string using XOR cipher
+    """
+    return ''.join(chr(ord(char) ^ ENCRYPTION_KEY) for char in cipher_text)
+
 def getEmployees():
     try:
         conn = get_db_connection()
@@ -22,9 +31,9 @@ def getEmployees():
         response = [
             {
                 "employee_id": emp[0],
-                "email": emp[1],
-                "employee_forename": emp[3],
-                "employee_surname": emp[4],
+                "email": xor_decrypt(emp[1]),  # Decrypting email
+                "employee_forename": xor_decrypt(emp[3]),  # Decrypting forename
+                "employee_surname": xor_decrypt(emp[4]),  # Decrypting surname
                 "role": emp[5],
                 "wage": emp[6]
             }

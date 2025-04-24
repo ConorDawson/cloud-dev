@@ -81,36 +81,60 @@ app.post('/login', async (req, res) => {
     return res.status(400).json({ error: "Email and password are required." });
   }
 
+  // XOR decryption function (same logic as Flask)
+  const xorDecrypt = (cipherText, key = 5) => {
+    return cipherText
+      .split('')
+      .map(char => String.fromCharCode(char.charCodeAt(0) ^ key))
+      .join('');
+  };
+
   try {
     const result = await pool.query(
-      'SELECT employee_id, employee_forename, employee_surname FROM users WHERE email = $1 AND password = $2',
-      [email, password]
+      'SELECT employee_id, employee_forename, employee_surname, email, password FROM users'
     );
 
-    if (result.rows.length > 0) {
-      const { employee_id, employee_forename, employee_surname } = result.rows[0];
+    let matchedUser = null;
 
-      // Store user data in session
-      req.session.user = {
-        employee_id,
-        employee_forename,
-        employee_surname,
-      };
-
-      res.json({
-        message: "Login successful",
-        employee_id,
-        forename: employee_forename,
-        surname: employee_surname,
-      });
-    } else {
-      res.status(401).json({ error: "Invalid email or password." });
+    for (const row of result.rows) {
+      const decryptedEmail = xorDecrypt(row.email);
+      if (decryptedEmail === email) {
+        matchedUser = row;
+        break;
+      }
     }
+
+    if (!matchedUser) {
+      return res.status(401).json({ error: "Invalid email or password." });
+    }
+
+    const decryptedPassword = xorDecrypt(matchedUser.password);
+    if (decryptedPassword !== password) {
+      return res.status(401).json({ error: "Invalid email or password." });
+    }
+
+    const decryptedForename = xorDecrypt(matchedUser.employee_forename);
+    const decryptedSurname = xorDecrypt(matchedUser.employee_surname);
+
+    req.session.user = {
+      employee_id: matchedUser.employee_id,
+      employee_forename: decryptedForename,
+      employee_surname: decryptedSurname
+    };
+
+    res.json({
+      message: "Login successful",
+      employee_id: matchedUser.employee_id,
+      forename: decryptedForename,
+      surname: decryptedSurname
+    });
+
   } catch (err) {
     console.error("Error during login:", err);
     res.status(500).json({ error: "Internal server error." });
   }
 });
+
 
 
 // Handle Logout (clear session)
@@ -143,6 +167,12 @@ app.post('/my_report', (req, res) => {
   res.sendFile(path.join(__dirname, 'views/my_report.html'));
 });
 
+app.post('/employee_reports', (req, res) => {
+  if (!req.session.user) {
+    return res.redirect('/');
+  }
+  res.sendFile(path.join(__dirname, 'views/employee_reports.html'));
+});
 
 
 // Home Route (before successful login)
@@ -180,36 +210,64 @@ app.post('/admin', (req, res) => {
 });
 
 
-
+ 
 // Serve employee management pages
 app.post('/add_employee', (req, res) => {
   res.sendFile(path.join(__dirname, 'public/admin/employee_functions/add_employee/add_employee.html'));
 });
 
-// API Endpoints
+
+app.post('/add_client', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public/admin/client_functions/add_client.html'));
+});
+
+function xorDecrypt(text, key = 5) {
+  return text
+    .split('')
+    .map(char => String.fromCharCode(char.charCodeAt(0) ^ key))
+    .join('');
+}
+
+
+
+
 app.get('/api/clients', async (req, res) => {
   try {
     const result = await pool.query('SELECT company_name FROM clients');
-    res.json(result.rows);
+    
+    const decryptedClients = result.rows.map(row => ({
+      company_name: xorDecrypt(row.company_name)
+    }));
+
+    res.json(decryptedClients);
   } catch (err) {
     console.error('Error fetching clients:', err);
     res.status(500).send('Server Error');
   }
 });
 
+
 app.post('/api/timesheet-hours', async (req, res) => {
   const { employee_id } = req.body;
   try {
-      const result = await pool.query(
-          'SELECT company_name, work_date, hours FROM timesheet_hours2 WHERE employee_id = $1 ORDER BY work_date',
-          [employee_id]
-      );
-      res.json(result.rows);
+    const result = await pool.query(
+      'SELECT company_name, work_date, hours FROM timesheet_hours2 WHERE employee_id = $1 ORDER BY work_date',
+      [employee_id]
+    );
+
+    const decryptedTimesheet = result.rows.map(row => ({
+      company_name: xorDecrypt(row.company_name),
+      work_date: row.work_date,
+      hours: row.hours
+    }));
+
+    res.json(decryptedTimesheet);
   } catch (err) {
-      console.error('Error fetching timesheet hours:', err);
-      res.status(500).send('Server Error');
+    console.error('Error fetching timesheet hours:', err);
+    res.status(500).send('Server Error');
   }
 });
+
 
 
 app.post('/submitTimesheet', async (req, res) => {
@@ -427,8 +485,174 @@ app.post('/delete_client', async (req, res) => {
   }
 });
 
+app.post('/add_new_client', async (req, res) => {
+  try {
+    const {
+      company_name, 
+      contact_person, 
+      email, 
+      phone_number, 
+      city, 
+      country, 
+      client_payment_amount, 
+      client_billing_schedule
+    } = req.body;
+
+    // Send the data to the backend (Flask or another server)
+    const response = await axios.post('http://localhost:5001/add_new_client', {
+      company_name, 
+      contact_person, 
+      email, 
+      phone_number, 
+      city, 
+      country, 
+      client_payment_amount, 
+      client_billing_schedule
+    });
+
+    // If the response status is 200, client was added successfully
+    if (response.status === 200) {
+      res.status(200).send('Client added successfully');
+    } else {
+      // Log the error response from the backend for debugging
+      console.log('Error response from Flask:', response.data);
+      res.status(response.status).json({ message: response.data.message || 'Unknown error' });
+    }
+  } catch (err) {
+    // Catch and log any errors
+    console.error('Error adding new client:', err);
+    if (err.response) {
+      // Log the error response from the backend (Flask)
+      console.error('Error response from Flask:', err.response.data);
+      res.status(err.response.status).json({ message: err.response.data.message || 'Error from Flask' });
+    } else {
+      // If no response from Flask, it's a server error on Express side
+      res.status(500).send('Server Error');
+    }
+  }
+});
 
 
+app.post('/update_client', async (req, res) => {
+  console.log('Reached server.js for update_client');
+  try {
+    const { 
+      client_id, 
+      company_name, 
+      contact_person, 
+      email, 
+      phone_number, 
+      city, 
+      country, 
+      client_payment_amount, 
+      client_billing_schedule 
+    } = req.body;
+
+    // Send data to Flask backend for processing
+    const response = await axios.post('http://localhost:5001/update_client', {
+      client_id, 
+      company_name, 
+      contact_person, 
+      email, 
+      phone_number, 
+      city, 
+      country, 
+      client_payment_amount, 
+      client_billing_schedule
+    });
+
+    if (response.status === 200) {
+      res.status(200).send('Client updated successfully');
+    } else {
+      console.log('Error response from Flask:', response.data); // Log error for debugging
+      res.status(response.status).json({ message: response.data.message || 'Unknown error' });
+    }
+  } catch (err) {
+    console.error('Error updating client:', err);
+    if (err.response) {
+      console.error('Error response from Flask:', err.response.data); // Log error from Flask
+      res.status(err.response.status).json({ message: err.response.data.message || 'Error from Flask' });
+    } else {
+      // If no response from Flask, it's a server error on Express side
+      res.status(500).send('Server Error');
+    }
+  }
+});
+
+
+app.post('/getEmployeeIDs', async (req, res) => {
+  try {
+    const response = await axios.post('http://localhost:5001/getEmployeeIDs', {});
+    res.json(response.data);
+  } catch (err) {
+    console.error('Error fetching employee IDs:', err);
+    res.status(500).send('Server Error');
+  }
+});
+
+app.post('/getEmployeeReportWorkYears', async (req, res) => {
+  const { employee_id } = req.body;
+  try {
+      const response = await axios.post('http://localhost:5001/getEmployeeReportWorkYears', {
+          employee_id
+      });
+      res.json(response.data);
+  } catch (err) {
+      console.error('Error fetching employees:', err);
+      res.status(500).send('Server Error');
+  }
+});
+
+app.post('/getEmployeeReport', async (req, res) => {
+  const { id, year } = req.body;
+  try {
+      const response = await axios.post('http://localhost:5001/getEmployeeReport', {
+          id,
+          year
+      });
+      res.json(response.data);
+  } catch (err) {
+      console.error('Error fetching employees:', err);
+      res.status(500).send('Server Error');
+  }
+})
+
+
+app.post('/getEmployeeInfo', async (req, res) => {
+  const { id } = req.body;
+  try {
+      const response = await axios.post('http://localhost:5001/getEmployeeInfo', {
+          id
+      });
+      res.json(response.data);
+  } catch (err) {
+      console.error('Error fetching employees:', err);
+      res.status(500).send('Server Error');
+  }
+});
+
+
+app.post('/predicted_reports', async (req, res) => {
+  try {
+    const response = await axios.post('http://localhost:5001/predicted_reports', req.body);
+    res.json(response.data);
+  }
+catch (err) {
+    console.error('Error fetching predicted reports:', err);
+    res.status(500).send('Server Error');
+  }
+});
+
+app.post('/getClientPaySchedules', async (req, res) => {
+  try {
+    const response = await axios.post('http://localhost:5001/getClientPaySchedules', {});
+    res.json(response.data);
+  } catch (err) {
+    console.error('Error fetching client payment schedules:', err);
+    res.status(500).send('Server Error');
+  }
+}
+);
 
 
 // Start server

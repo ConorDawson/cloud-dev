@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Add Employee</title>
+  <link rel="stylesheet" href="/style/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.16.9/xlsx.full.min.js"></script>
+  <script src="/admin/client_functions/add_client.js" defer></script> 
+</head>
+<body class="container">
+
+  <div class="navbar">
+    <form action="/logout" method="POST"><button type="submit" class="button">Logout</button></form>
+    <form action="/current" method="POST"><button type="submit" class="button">Current Reports</button></form>
+    <form action="/home" method="POST"><button type="submit" class="button">My Timesheet</button></form>
+    <form action="/my_report" method="POST"><button type="submit" class="button">My Work Breakdown</button></form>
+    <form action="/predicted" method="POST"><button type="submit" class="button">Predictive Reports</button></form>
+    <form action="/employee_reports" method="POST"><button type="submit" class="button">Employee Reports</button></form>
+    <form action="/admin" method="POST"><button type="submit" class="button">Administration</button></form>
+  </div>
+
+  <div class="employees_card">
+    <h1 id="reportHeading">Add Client</h1>
+    <form id="addClient" method="POST">
+        <label for="companyName">Company Name:</label>
+        <input type="text" id="companyName" name="companyName" required>
+        
+        <label for="contactPerson">Contact Person:</label>
+        <input type="text" id="contactPerson" name="contactPerson" required>
+        
+        <label for="email">Email:</label>
+        <input type="email" id="email" name="email" required>
+        
+        <label for="phoneNumber">Phone Number:</label>
+        <input type="text" id="phoneNumber" name="phoneNumber" required>
+        
+        <label for="city">City:</label>
+        <input type="text" id="city" name="city" required>
+        
+        <label for="country">Country:</label>
+        <input type="text" id="country" name="country" required>
+        
+        <label for="clientPaymentAmount">Client Payment Amount:</label>
+        <input type="text" id="clientPaymentAmount" name="clientPaymentAmount" required>
+        
+        <label for="clientBillingSchedule">Billing Schedule:</label>
+        <select id="clientBillingSchedule" name="clientBillingSchedule" required>
+            <option value="A">Annually</option>
+            <option value="BA">Bi-Annually</option>
+            <option value="Q">Quarterly</option>
+            <option value="M">Monthly</option>
+        </select>
+        
+        <button type="submit" class="gen-button" id="addClientSubmit"> <i class="fa-solid fa-table-list"></i> Add Client</button>
+    </form>
+    
+      
+  </div>
+  
+
+</body>
+</html>

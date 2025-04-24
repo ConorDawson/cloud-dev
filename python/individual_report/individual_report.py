@@ -4,6 +4,21 @@ from python.database import get_db_connection
 
 app = Flask(__name__)
 
+# XOR decryption function
+def xor_decrypt(text, key=5):
+    """
+    XOR decryption for the encrypted text.
+    """
+    return ''.join([chr(ord(char) ^ key) for char in text])
+
+# XOR encryption function
+def xor_encrypt(text, key=5):
+    """
+    XOR encryption for the given text.
+    """
+    return ''.join([chr(ord(char) ^ key) for char in text])
+
+
 def getEmployeeWorkYears(data):
     try:
         conn = get_db_connection()
@@ -34,9 +49,6 @@ def getEmployeeWorkYears(data):
         if conn:
             conn.close()
 
-
-
-
 def get_client_hours_for_employee(data):
     try:
         conn = get_db_connection()
@@ -57,8 +69,11 @@ def get_client_hours_for_employee(data):
         client_hours = cursor.fetchall()
         print(client_hours)
 
-        if client_hours:
-            return {'client_hours': client_hours}  # Return a dictionary, not jsonify()
+        # Decrypt company names
+        decrypted_client_hours = [(xor_decrypt(company_name), total_hours) for company_name, total_hours in client_hours]
+
+        if decrypted_client_hours:
+            return {'client_hours': decrypted_client_hours}  # Return a dictionary, not jsonify()
         else:
             return {'error': 'No client hours found for employee'}
 
@@ -70,7 +85,6 @@ def get_client_hours_for_employee(data):
         if conn:
             conn.close()
 
-            
 def get_individual_monthly_report(data):
     try:
         conn = get_db_connection()
@@ -78,6 +92,8 @@ def get_individual_monthly_report(data):
         employee_id = data.get('employee_id')
         year = data.get('year')
         company_name = data.get('company_name')
+
+        encrypted_company_name = xor_encrypt(company_name)  # Encrypt the company name
         print("Reached get_individual_monthly_report")
 
         cursor.execute("""
@@ -90,7 +106,7 @@ def get_individual_monthly_report(data):
                 AND th.company_name = %s
             GROUP BY EXTRACT(MONTH FROM th.work_date)
             ORDER BY month;
-        """, (employee_id, year, company_name))
+        """, (employee_id, year, encrypted_company_name))
 
         monthly_report = cursor.fetchall()
         print(monthly_report)
@@ -127,6 +143,7 @@ def get_monthly_chart(data):
         cursor = conn.cursor()
         employee_id = data.get('employee_id')
         year = data.get('year')
+      
         print("Reached get_monthly_chart")
 
         cursor.execute("""
@@ -134,13 +151,17 @@ def get_monthly_chart(data):
                 EXTRACT(MONTH FROM th.work_date) AS month,
                 SUM(th.hours) AS total_hours
             FROM timesheet_hours2 th
-            WHERE th.employee_id = %s AND EXTRACT(YEAR FROM th.work_date) = %s
+            WHERE th.employee_id = %s 
+                AND EXTRACT(YEAR FROM th.work_date) = %s 
             GROUP BY EXTRACT(MONTH FROM th.work_date)
             ORDER BY month;
         """, (employee_id, year))
 
         monthly_data = cursor.fetchall()
-        print(monthly_data)
+        print(f"Fetched monthly data: {monthly_data}")
+
+        if not monthly_data:
+            return {'error': 'No monthly chart data found for employee'}
 
         # List of month names
         month_names = [
@@ -151,17 +172,20 @@ def get_monthly_chart(data):
         # Prepare a dictionary to map month names to their respective hours
         chart_data = []
         for month, total_hours in monthly_data:
-            month_name = month_names[int(month) - 1]  # Convert month number to month name
-            chart_data.append({ 'month': month_name, 'total_hours': total_hours })
+            # Check if month is a valid integer between 1 and 12
+            if 1 <= int(month) <= 12:
+                month_name = month_names[int(month) - 1]  # Convert month number to month name
+                chart_data.append({'month': month_name, 'total_hours': total_hours})
 
         if chart_data:
             return {'monthly_chart': chart_data}  # Return the structured chart data
         else:
-            return {'error': 'No monthly chart data found for employee'}
+            return {'error': 'No valid monthly chart data found for employee'}
         
     except Exception as e:
         print("Error fetching data:", e)
         return {'error': 'Internal Server Error'}  # Return a dictionary
-
-
-
+    
+    finally:
+        if conn:
+            conn.close()

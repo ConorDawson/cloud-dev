@@ -3,6 +3,16 @@ from flask import Flask, jsonify, request
 from dateutil.relativedelta import relativedelta
 from datetime import datetime
 
+# Encryption key
+ENCRYPTION_KEY = 5
+
+# XOR encryption/decryption functions
+def xor_encrypt(text):
+    return ''.join(chr(ord(char) ^ ENCRYPTION_KEY) for char in text)
+
+def xor_decrypt(cipher_text):
+    return ''.join(chr(ord(char) ^ ENCRYPTION_KEY) for char in cipher_text)
+
 # Database connection information
 DB_CONFIG = {
     "user": "postgres",
@@ -27,7 +37,22 @@ def get_db_connection():
     )
     return conn
 
+@app.route('/monthly-report', methods=['POST'])
+def get_monthly_report():
+    try:
+        req_data = request.get_json()
+        client_plain = req_data['client']
+        start_date = req_data['start_date']
+        end_date = req_data['end_date']
+
+        return fetch_monthly_report(client_plain, start_date, end_date)
+    except Exception as e:
+        print("Request error:", str(e))
+        return jsonify({"error": "Invalid input"}), 400
+
 def fetch_monthly_report(client, start_date, end_date):
+    encrypted_client = xor_encrypt(client)
+
     query = """
     SELECT 
         TO_CHAR(th.work_date, 'YYYY-MM') AS month_year,
@@ -37,7 +62,9 @@ def fetch_monthly_report(client, start_date, end_date):
         cb.client_billing_schedule
     FROM timesheet_hours2 th
     LEFT JOIN employee_pay ep ON ep.employee_id = th.employee_id
-    LEFT JOIN client_billing cb ON cb.client_id = (SELECT id FROM clients WHERE company_name = %s)
+    LEFT JOIN client_billing cb ON cb.client_id = (
+        SELECT id FROM clients WHERE company_name = %s
+    )
     WHERE th.company_name = %s AND th.work_date BETWEEN %s AND %s
     GROUP BY month_year, cb.client_payment_amount, cb.client_billing_schedule
     ORDER BY month_year;
@@ -48,29 +75,23 @@ def fetch_monthly_report(client, start_date, end_date):
     try:
         with psycopg2.connect(**DB_CONFIG) as conn:
             with conn.cursor() as cursor:
-                cursor.execute(query, (client, client, start_date, end_date))  # Safe parameterized query
+                cursor.execute(query, (encrypted_client, encrypted_client, start_date, end_date))
                 rows = cursor.fetchall()
-                
+
                 start_dt = start_date if isinstance(start_date, datetime) else datetime.strptime(start_date, "%Y-%m-%d")
                 end_dt = end_date if isinstance(end_date, datetime) else datetime.strptime(end_date, "%Y-%m-%d")
-                months_selected = (end_dt.year - start_dt.year) * 12 + (end_dt.month - start_dt.month) + 1
 
                 for month_year, total_hours, total_cost, client_payment, billing_schedule in rows:
-                    # Determine the number of payments per year
-                    payments_per_year = 12  # Default to annual billing
-                    if billing_schedule == 'A':  # Paid every 6 months
-                        payments_per_year = 12
-                    elif billing_schedule == 'BA':  # Paid every 6 months
+                    payments_per_year = 12  # Default yearly
+
+                    if billing_schedule == 'BA':
                         payments_per_year = 6
-                    elif billing_schedule == 'Q':  # Paid every 3 months
+                    elif billing_schedule == 'Q':
                         payments_per_year = 3
-                    elif billing_schedule == 'M':  # Paid every month
+                    elif billing_schedule == 'M':
                         payments_per_year = 1
 
-                    # Adjust client payment amount to a monthly value
                     monthly_payment = client_payment / payments_per_year
-
-                    # Calculate profit/loss percentage
                     profit_loss_percentage = ((monthly_payment - total_cost) / total_cost) * 100 if total_cost != 0 else 0
                     
                     data[month_year] = {

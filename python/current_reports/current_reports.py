@@ -27,7 +27,11 @@ def get_db_connection():
     )
     return conn
 
-
+def xor_decrypt(text, key=5):
+    """
+    XOR decryption for the encrypted text.
+    """
+    return ''.join([chr(ord(char) ^ key) for char in text])
 
 def fetch_client_data(start_date, end_date):
     """
@@ -52,7 +56,16 @@ def fetch_client_data(start_date, end_date):
     with psycopg2.connect(**DB_CONFIG) as conn:
         with conn.cursor() as cursor:
             cursor.execute(query, (start_date, end_date))  # Safe parameterized query
-            return cursor.fetchall()
+            rows = cursor.fetchall()
+
+    # Decrypt company names
+    decrypted_rows = []
+    for row in rows:
+        decrypted_row = list(row)
+        decrypted_row[0] = xor_decrypt(decrypted_row[0])  # Decrypt company_name
+        decrypted_rows.append(tuple(decrypted_row))
+
+    return decrypted_rows
 
 def process_client_data(rows):
     """
@@ -80,10 +93,6 @@ def process_client_data(rows):
         client_data[company_name]['total_cost'] += hours * employee_wage
     
     return client_data
-
-
-
-
 
 def calculate_profit_loss(client_data, start_date, end_date):
     """
@@ -126,9 +135,6 @@ def calculate_profit_loss(client_data, start_date, end_date):
 
     return client_data
 
-
-
-
 def prepare_final_data(client_data):
     """
     Prepares the final data structure for the response.
@@ -144,7 +150,6 @@ def prepare_final_data(client_data):
             'Billing Schedule': info['billing_schedule']
         })
     return data
-
 
 if __name__ == '__main__':
     app.run(port=5001)

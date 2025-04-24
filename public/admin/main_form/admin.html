@@ -84,6 +84,50 @@
     </div>
 </div>
 
+<!-- Toast popup for client updates -->
+<div id="clientToast" class="toast">
+    <div class="toast-content">
+        <h3>Update Client</h3>
+
+        <!-- Hidden clientId field for reference during update -->
+        <input type="hidden" id="clientId" name="clientId" required>
+
+        <label for="companyName">Company Name:</label>
+        <input type="text" id="companyName" name="companyName" required>
+        
+        <label for="contactPerson">Contact Person:</label>
+        <input type="text" id="contactPerson" name="contactPerson" required>
+        
+        <label for="email">Email:</label>
+        <input type="email" id="email" name="email" required>
+        
+        <label for="phoneNumber">Phone Number:</label>
+        <input type="text" id="phoneNumber" name="phoneNumber" required>
+        
+        <label for="city">City:</label>
+        <input type="text" id="city" name="city" required>
+        
+        <label for="country">Country:</label>
+        <input type="text" id="country" name="country" required>
+        
+        <label for="clientPaymentAmount">Client Payment Amount:</label>
+        <input type="text" id="clientPaymentAmount" name="clientPaymentAmount" required>
+        
+        <label for="clientBillingSchedule">Billing Schedule:</label>
+        <select id="clientBillingSchedule" name="clientBillingSchedule" required>
+            <option value="A">Annually</option>
+            <option value="BA">Bi-Annually</option>
+            <option value="Q">Quarterly</option>
+            <option value="M">Monthly</option>
+        </select>
+        <button id="updateClientBtn">Save Changes</button>
+        <button id="closeClientToast">Close</button>
+    </div>
+</div>
+
+
+
+
 
 </body>
 </html>

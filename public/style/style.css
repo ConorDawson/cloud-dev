@@ -448,3 +448,14 @@ form[action="/delete_employee"] .button:hover {
   background-color: #c82333;
 }
 }
+
+html, body {
+  height: auto;
+  max-height: none;
+  overflow-y: auto;
+}
+
+.reports_card, .container {
+  overflow-y: auto;
+  max-height: none;
+}

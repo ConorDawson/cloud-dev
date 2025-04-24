@@ -399,7 +399,7 @@ window.onload = async function () {
     
         const startDate = document.getElementById('startDate').value;
         const endDate = document.getElementById('endDate').value;
-        const fileName = `Current_Profit_Loss_Percentages_for_${startDate}_to_${endDate}.xlsx`;
+        const fileName = `Current_Profit_Loss_Percentages_for_${startDate}_to_${endDate}.csv`;
     
         const link = document.createElement('a');
         link.setAttribute('href', encodedUri);

@@ -90,7 +90,6 @@ function openUpdateToast(event) {
 
 }
 
-
 async function updateUser() {
     const employeeData = {
         email: document.getElementById('employeeEmail').value,
@@ -192,10 +191,15 @@ function populateClientTable(clients) {
             <td>${client.client_billing_schedule}</td>
             <td>${client.client_payment_amount}</td>
             <td class="actions">
-                <button class="update-btn" data-id="${client.client_id}" 
+                <button class="update-client" data-id="${client.client_id}" 
                         data-company_name="${client.company_name}" 
                         data-billing_schedule="${client.client_billing_schedule}" 
-                        data-payment_amount="${client.client_payment_amount}" >
+                        data-payment_amount="${client.client_payment_amount}"
+                        data-contact_person="${client.contact_person}"
+                        data-email="${client.email}"
+                        data-phone_number="${client.phone_number}"
+                        data-city="${client.city}"
+                        data-country="${client.country}">
                     Update
                 </button>
                 <button class="delete-client-btn" data-id="${client.client_id}">Delete</button>
@@ -205,9 +209,11 @@ function populateClientTable(clients) {
     });
 
     // Attach event listeners to update buttons
-    document.querySelectorAll('.update-btn').forEach(button => {
-        button.addEventListener('click', openUpdateToast);
-    });
+   // Corrected event listener attachment
+document.querySelectorAll('.update-client').forEach(button => {
+    button.addEventListener('click', openUpdateClientToast);
+});
+
 
     // Attach event listeners to delete buttons
     document.querySelectorAll('.delete-client-btn').forEach(button => {
@@ -240,13 +246,68 @@ async function deleteClient(event) {
     }
 }
 
+function openUpdateClientToast(event) {
+    const button = event.target;
+
+    // Fill form with client data
+    document.getElementById('clientId').value = button.dataset.id;
+    document.getElementById('companyName').value = button.dataset.company_name;
+    document.getElementById('contactPerson').value = button.dataset.contact_person;  // New field
+    document.getElementById('email').value = button.dataset.email;  // New field
+    document.getElementById('phoneNumber').value = button.dataset.phone_number;  // New field
+    document.getElementById('city').value = button.dataset.city;  // New field
+    document.getElementById('country').value = button.dataset.country;  // New field
+    document.getElementById('clientPaymentAmount').value = button.dataset.payment_amount;
+    document.getElementById('clientBillingSchedule').value = button.dataset.billing_schedule;
+
+    // Show the toast popup for updating client
+    document.getElementById('clientToast').style.display = 'block';
+}
 
 
+// Handle client update
+async function updateClient() {
+    const clientData = {
+        client_id: document.getElementById('clientId').value,
+        company_name: document.getElementById('companyName').value,
+        client_billing_schedule: document.getElementById('clientBillingSchedule').value,
+        client_payment_amount: document.getElementById('clientPaymentAmount').value,
+        contact_person: document.getElementById('contactPerson').value,  // New field
+        email: document.getElementById('email').value,  // New field
+        phone_number: document.getElementById('phoneNumber').value,  // New field
+        city: document.getElementById('city').value,  // New field
+        country: document.getElementById('country').value  // New field
+    };
 
-// Close toast on cancel
-document.getElementById('closeToast').addEventListener('click', () => {
-    document.getElementById('t').style.display = 'none';
+    try {
+        const response = await fetch('/update_client', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(clientData)
+        });
+
+        if (response.ok) {
+            alert('Client updated successfully');
+            fetchClients();  // Refresh the client list
+            document.getElementById('clientToast').style.display = 'none';  // Hide toast
+        } else {
+            throw new Error('Error updating client');
+        }
+    } catch (error) {
+        console.error('Error updating client:', error);
+    }
+}
+
+// Close toast on cancel or close button click
+document.getElementById('closeClientToast').addEventListener('click', () => {
+    document.getElementById('clientToast').style.display = 'none';
 });
+
+// Add event listener for the update button
+document.getElementById('updateClientBtn').addEventListener('click', updateClient);
+
 
 
 
