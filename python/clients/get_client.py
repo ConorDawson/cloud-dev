@@ -1,6 +1,6 @@
 from flask import Flask, jsonify, request
 from datetime import datetime
-from python.database import get_db_connection  # Make sure this is the correct import path for your get_db_connection
+from python.database import get_db_connection
 
 app = Flask(__name__)  # Define the Flask app
 

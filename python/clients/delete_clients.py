@@ -2,6 +2,8 @@ import psycopg2
 from flask import Flask, jsonify, request
 from datetime import datetime
 from python.database import get_db_connection
+import os
+
 
 def delete_client(data):
     client_id = data.get('client_id')

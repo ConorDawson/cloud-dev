@@ -1,6 +1,8 @@
 import psycopg2
 from flask import Flask, jsonify, request
 from psycopg2.extras import execute_values
+import os
+
 
 # Encryption key
 ENCRYPTION_KEY = 5
@@ -14,11 +16,12 @@ def xor_decrypt(cipher_text):
 
 # Database connection info
 DB_CONFIG = {
-    "user": "postgres",
-    "password": "postgres",
-    "host": "localhost",
-    "port": 5432,
-    "database": "postgres"
+    "user": os.getenv("DB_USER", "postgres"),
+    "password": os.getenv("DB_PASSWORD", "postgres"),
+    "host": os.getenv("DB_HOST", "express-finance-db.c500oesmmplc.eu-north-1.rds.amazonaws.com"),
+    "port": os.getenv("DB_PORT", "5432"),
+    "database": os.getenv("DB_DATABASE", "postgres"),
+    "sslmode": "require"  # Ensures SSL is used if required
 }
 
 app = Flask(__name__)
