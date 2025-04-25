@@ -1,10 +1,8 @@
 import psycopg2
 from flask import Flask, jsonify, request
-<<<<<<< HEAD
-=======
+
 from datetime import datetime
 import os
->>>>>>> 50dd3cc25da3147c6034d57b12355bf1fa27adc0
 
 # Database connection information
 DB_CONFIG = {
@@ -25,7 +23,6 @@ def get_db_connection():
     """
     Establish a connection to the PostgreSQL database
     """
-<<<<<<< HEAD
     conn = psycopg2.connect(
         user=DB_CONFIG["user"],
         password=DB_CONFIG["password"],
@@ -40,7 +37,7 @@ def xor_encrypt(text):
     Encrypt a string using XOR cipher
     """
     return ''.join(chr(ord(char) ^ ENCRYPTION_KEY) for char in text)
-=======
+
     try:
         conn = psycopg2.connect(
             user=DB_CONFIG["user"],
@@ -54,7 +51,6 @@ def xor_encrypt(text):
     except psycopg2.Error as e:
         print("Database connection error:", e)
         return None
->>>>>>> 50dd3cc25da3147c6034d57b12355bf1fa27adc0
 
 def xor_decrypt(cipher_text):
     """
